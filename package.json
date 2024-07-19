@@ -1,0 +1,19 @@
+{
+  "name": "learning_backend_development",
+  "version": "1.0.0",
+  "description": "Learning Backend Development From Chai Aur Code",
+  "main": "Source.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon Source.js"
+  },
+  "author": "Mohammad Umar Farooque",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.5.1"
+  }
+}
