@@ -1,14 +1,15 @@
 require('dotenv').config();
 const Express = require("express");
+const Process = require('node:process');
 const Cors = require("cors");
 const Helmet = require('helmet');
 const Morgan = require('morgan'); // Logging middleware
 const RateLimit = require("express-rate-limit"); // Rate limiting middleware
 
 const App = Express();
-const PORT = process.env.PORT || 7000;
+const PORT = Process.env.PORT || 7000;
 
-const AllowedOrigins = process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000'];
+const AllowedOrigins = Process.env.CORS_ORIGINS ? Process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000'];
 const CorsOptions = {
     origin: (origin, callback) => {
         if (!origin || AllowedOrigins.includes(origin)) {
@@ -17,11 +18,11 @@ const CorsOptions = {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    methods: process.env.CORS_METHODS || "GET,HEAD,PUT,PATCH,POST,DELETE",
-    allowedHeaders: process.env.CORS_ALLOWED_HEADERS || "Content-Type, Authorization",
-    credentials: process.env.CORS_CREDENTIALS === "true",
-    preflightContinue: process.env.CORS_PREFLIGHT_CONTINUE === "true",
-    optionsSuccessStatus: parseInt(process.env.CORS_OPTION_SUCCESS_STATUS) || 200
+    methods: Process.env.CORS_METHODS || "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: Process.env.CORS_ALLOWED_HEADERS || "Content-Type, Authorization",
+    credentials: Process.env.CORS_CREDENTIALS === "true",
+    preflightContinue: Process.env.CORS_PREFLIGHT_CONTINUE === "true",
+    optionsSuccessStatus: parseInt(Process.env.CORS_OPTION_SUCCESS_STATUS) || 200
 }
 App.use(Cors(CorsOptions));
 App.use(Helmet());
