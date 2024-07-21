@@ -6,14 +6,14 @@ import CLUSTER from "node:cluster";
 import OPERATING_SYSTEM from "node:os";
 import PROCESS from "node:process";
 
-/********************* Get the directory name of the current module *********************/
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = PATH.dirname(__filename);
-
 /********************* Import the required files and functions *********************/
 import ConnectDatabase from "./Database.js";
 import App from "./App.js";
 import { ONLINE, MESSAGE, SHUTDOWN, UNHANDLED_REJECTION, UNCAUGHT_EXCEPTION, DATABASE_CONNECTED, EXIT, ERROR, SIGTERM, SIGINT, DISCONNECT, LISTENING, FORK } from "./Constants.js";
+
+/********************* Get the directory name of the current module *********************/
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = PATH.dirname(__filename);
 
 /********************* Load environment variables from .env file *********************/
 DOTENV.config({
