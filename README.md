@@ -6,10 +6,13 @@ This is a sample backend structure used in production.
 
 # .env file
 
-- CORS_ORIGIN=*
-- CORS_METHODS=GET,HEAD,PUT,PATCH,POST,DELETE
-- CORS_ALLOWED_HEADERS=Content-Type, Authorization
-- CORS_CREDENTIALS=true
-- CORS_PREFLIGHT_CONTINUE=false
-- CORS_OPTION_SUCCESS_STATUS=200
-- PORT=7000
+- CORS_ORIGIN = http://localhost:3000,http://localhost:7000
+- CORS_METHODS = GET,HEAD,PUT,PATCH,POST,DELETE
+- CORS_ALLOWED_HEADERS = Content-Type, Authorization
+- CORS_CREDENTIALS = true
+- CORS_PREFLIGHT_CONTINUE = false
+- CORS_OPTION_SUCCESS_STATUS = 200
+
+- PORT = 7000
+
+- MONGODB_URI = Your MongoDB URL

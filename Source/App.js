@@ -1,22 +1,25 @@
-/********************* Load environment variables from .env file *********************/
-require('dotenv').config();
-
 /********************* Import the required Packages *********************/
-const Express = require("express");
-const Process = require('node:process');
-const Cors = require("cors");
-const Helmet = require('helmet');
-const Morgan = require('morgan');
-const RateLimit = require("express-rate-limit");
+import DOTENV from "dotenv";
+import EXPRESS from "express";
+import PROCESS from "node:process";
+import CORS from "cors";
+import HELMET from "helmet";
+import RATE_LIMIT from "express-rate-limit";
+import MORGAN from "morgan";
+
+/********************* Load environment variables from .env file *********************/
+DOTENV.config({
+    path: "../.env"
+});
 
 /********************* Create an instance of the Express application *********************/
-const App = Express();
+const App = EXPRESS();
 
-/********************* Set the port from environment variables or default to 7000 *********************/
-const PORT = Process.env.PORT || 7000;
+/********************* Use middleware to parse JSON requests *********************/
+App.use(EXPRESS.json());
 
 /********************* Define allowed origins for CORS from environment variables or default to localhost *********************/
-const AllowedOrigins = Process.env.CORS_ORIGINS ? Process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000'];
+const AllowedOrigins = PROCESS.env.CORS_ORIGINS ? PROCESS.env.CORS_ORIGINS.split(',') : ['http://localhost:3000'];
 
 /********************* Define CORS options *********************/
 const CorsOptions = {
@@ -27,34 +30,34 @@ const CorsOptions = {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    methods: Process.env.CORS_METHODS || "GET,HEAD,PUT,PATCH,POST,DELETE",
-    allowedHeaders: Process.env.CORS_ALLOWED_HEADERS || "Content-Type, Authorization",
-    credentials: Process.env.CORS_CREDENTIALS === "true",
-    preflightContinue: Process.env.CORS_PREFLIGHT_CONTINUE === "true",
-    optionsSuccessStatus: parseInt(Process.env.CORS_OPTION_SUCCESS_STATUS) || 200
+    methods: PROCESS.env.CORS_METHODS || "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: PROCESS.env.CORS_ALLOWED_HEADERS || "Content-Type, Authorization",
+    credentials: PROCESS.env.CORS_CREDENTIALS === "true",
+    preflightContinue: PROCESS.env.CORS_PREFLIGHT_CONTINUE === "true",
+    optionsSuccessStatus: parseInt(PROCESS.env.CORS_OPTION_SUCCESS_STATUS) || 200
 }
 
-/********************* Use middleware to parse JSON requests *********************/
-App.use(Express.json());
-
 /********************* Use CORS middleware with the defined options *********************/
-App.use(Cors(CorsOptions));
+App.use(CORS(CorsOptions));
 
 /********************* Use Helmet middleware to secure HTTP headers *********************/
-App.use(Helmet()); // It helps increase security by setting various HTTP headers that protect against common web vulnerabilities
-
-/********************* Use Morgan middleware for logging in 'combined' format *********************/
-App.use(Morgan('combined')); // Use 'combined' for more detailed logs
+App.use(HELMET()); // It helps increase security by setting various HTTP headers that protect against common web vulnerabilities
 
 /********************* Define rate limit options *********************/
-const Limiter = RateLimit({
+const Limiter = RATE_LIMIT({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 100 requests per windowMs
     message: "Too many requests, Please try again later.", // Message to send when rate limit is exceeded
 });
 
+/********************* Use Morgan middleware for logging in 'combined' format *********************/
+App.use(MORGAN('combined')); // Use 'combined' for more detailed logs
+
 /********************* Use rate limit middleware *********************/
 App.use(Limiter);
+
+/********************* Set the port from environment variables or default to 7000 *********************/
+const PORT = PROCESS.env.PORT || 7000;
 
 /********************* Declare the Routes *********************/
 App.get("/api/v1/test", (Request, Response) => {
@@ -65,7 +68,7 @@ App.get("/api/v1/test", (Request, Response) => {
             }
         ]
     )
-})
+});
 
 /********************* Error handling middleware *********************/
 App.use((Error, Request, Response, Next) => {
@@ -79,4 +82,4 @@ App.use((Request, Response, Next) => {
 });
 
 /********************* Export the Express App *********************/
-module.exports = App;
+export default App;
