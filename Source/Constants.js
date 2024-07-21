@@ -1,4 +1,7 @@
+/* Database Constants */
 export const DATABASE_NAME = "YoutubeClone";
+
+/* Server Constants */
 export const ONLINE = "online";
 export const FORK = "fork";
 export const LISTENING = "listening";

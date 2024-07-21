@@ -1,5 +1,7 @@
 /********************* Import the required Packages *********************/
 import DOTENV from "dotenv";
+import PATH from "path";
+import { fileURLToPath } from 'url';
 import EXPRESS from "express";
 import PROCESS from "node:process";
 import CORS from "cors";
@@ -7,9 +9,13 @@ import HELMET from "helmet";
 import RATE_LIMIT from "express-rate-limit";
 import MORGAN from "morgan";
 
+/********************* Get the directory name of the current module *********************/
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = PATH.dirname(__filename);
+
 /********************* Load environment variables from .env file *********************/
 DOTENV.config({
-    path: "../.env"
+    path: PATH.resolve(__dirname, '../.env')
 });
 
 /********************* Create an instance of the Express application *********************/

@@ -1,8 +1,14 @@
 /********************* Import the required Packages *********************/
 import DOTENV from "dotenv";
+import PATH from "path";
+import { fileURLToPath } from 'url';
 import CLUSTER from "node:cluster";
 import OPERATING_SYSTEM from "node:os";
 import PROCESS from "node:process";
+
+/********************* Get the directory name of the current module *********************/
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = PATH.dirname(__filename);
 
 /********************* Import the required files and functions *********************/
 import ConnectDatabase from "./Database.js";
@@ -11,7 +17,7 @@ import { ONLINE, MESSAGE, SHUTDOWN, UNHANDLED_REJECTION, UNCAUGHT_EXCEPTION, DAT
 
 /********************* Load environment variables from .env file *********************/
 DOTENV.config({
-    path: "../.env"
+    path: PATH.resolve(__dirname, '../.env')
 });
 
 /********************* Set the port from environment variables or default to 7000 *********************/
@@ -128,7 +134,9 @@ const isWorkerForked = [];
             /* Iterate over all worker processesr */
             Object.values(CLUSTER.workers).forEach((worker) => {
                 /* Send a shutdown message to each worker */
-                worker.send(SHUTDOWN);
+                if (worker.isConnected()) {
+                    worker.send(SHUTDOWN);
+                }
             });
             /* Wait for workers to shutdown gracefully before exiting the master process */
             setTimeout(() => {

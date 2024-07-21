@@ -18,6 +18,10 @@ const ConnectDatabase = async () => {
         return;
     }
 
+    if (!MongoDB_URI) {
+        throw new Error("MongoDB_URI environment variable is not set");
+    }
+
     try {
         const ConnectionInstance = await MONGOOSE.connect(`${MongoDB_URI}/${DATABASE_NAME}`);
         isConnected = true;
