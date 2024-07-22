@@ -75,8 +75,8 @@ const StartServer = async () => {
             console.error(`Uncaught Exception: ${error}`);
             GracefullyShutdownServer(1); // Gracefully shut down with exit code 1.
         });
-    } catch (Error) {
-        console.error(`Error starting server: ${Error.message}`); // Log any error that occurs while starting the server.
+    } catch (error) {
+        console.error(`Error starting server: ${error.message}`); // Log any error that occurs while starting the server.
         PROCESS.exit(1); // Exit the process with an error code.
     }
 }
@@ -97,9 +97,9 @@ const isWorkerForked = [];
             for (let i = 0; i < totalCPUs; i++) {
                 CLUSTER.fork();
             }
-        }).catch((Error) => {
+        }).catch((error) => {
             console.error({
-                error: Error,
+                error: error,
                 message: `An error occured while connection to the Database`,
             });
         });

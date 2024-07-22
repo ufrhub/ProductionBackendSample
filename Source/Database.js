@@ -26,8 +26,8 @@ const CONNECT_DATABASE = async () => {
         const ConnectionInstance = await MONGOOSE.connect(`${MongoDB_URI}/${DATABASE_NAME}`);
         isConnected = true;
         console.info(`\nMongoDB Database Connected...! \nDATABASE HOST = ${ConnectionInstance.connection.host}`);
-    } catch (Error) {
-        console.error(`MongoDB connection error: ${Error}`);
+    } catch (error) {
+        console.error(`MongoDB connection error: ${error}`);
         isConnected = false;
         PROCESS.exit(1)
     }

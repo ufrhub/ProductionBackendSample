@@ -54,7 +54,7 @@ const CorsOptions = {
     credentials: PROCESS.env.CORS_CREDENTIALS === "true",
     preflightContinue: PROCESS.env.CORS_PREFLIGHT_CONTINUE === "true",
     optionsSuccessStatus: parseInt(PROCESS.env.CORS_OPTION_SUCCESS_STATUS) || 200
-}
+};
 
 /********************* Use CORS middleware with the defined options *********************/
 APPLICATION.use(CORS(CorsOptions));
