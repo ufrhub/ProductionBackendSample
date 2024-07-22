@@ -3,7 +3,7 @@ import MONGOOSE from "mongoose";
 import PROCESS from "node:process";
 
 /********************* Import the required files and functions *********************/
-import { DATABASE_NAME } from "./Constants.js";
+import { DATABASE_NAME } from "./Utilities/Constants.js";
 
 /********************* Connection State *********************/
 let isConnected = false;

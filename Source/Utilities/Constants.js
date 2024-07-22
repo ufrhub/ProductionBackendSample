@@ -12,6 +12,5 @@ export const SHUTDOWN = "shutdown";
 export const UNHANDLED_REJECTION = "unhandledRejection";
 export const UNCAUGHT_EXCEPTION = "uncaughtException";
 export const DATABASE_CONNECTED = "DatabaseConnected";
-export const ERROR = "error";
 export const SIGTERM = "SIGTERM";
 export const SIGINT = "SIGINT";
