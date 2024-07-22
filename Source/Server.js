@@ -1,18 +1,18 @@
 /********************* Import the required Packages *********************/
 import DOTENV from "dotenv";
 import PATH from "path";
-import { fileURLToPath } from 'url';
+import URL from 'url';
 import CLUSTER from "node:cluster";
 import OPERATING_SYSTEM from "node:os";
 import PROCESS from "node:process";
 
 /********************* Import the required files and functions *********************/
-import { ConnectDatabase } from "./Database.js";
-import { App } from "./App.js";
+import { CONNECT_DATABASE } from "./Database.js";
+import { APPLICATION } from "./Application.js";
 import { ONLINE, MESSAGE, SHUTDOWN, UNHANDLED_REJECTION, UNCAUGHT_EXCEPTION, DATABASE_CONNECTED, EXIT, ERROR, SIGTERM, SIGINT, DISCONNECT, LISTENING, FORK } from "./Constants.js";
 
 /********************* Get the directory name of the current module *********************/
-const __filename = fileURLToPath(import.meta.url);
+const __filename = URL.fileURLToPath(import.meta.url);
 const __dirname = PATH.dirname(__filename);
 
 /********************* Load environment variables from .env file *********************/
@@ -27,7 +27,7 @@ const PORT = PROCESS.env.PORT || 7000;
 const StartServer = async () => {
     try {
         /* Start the server and listen on the specified port. Log the server and worker information. */
-        const Server = await App.listen((PORT), () => {
+        const Server = await APPLICATION.listen((PORT), () => {
             console.info({
                 worker: `Worker ${PROCESS.pid} started`,
                 server: `Server is running on PORT = ${PORT}`,
@@ -80,7 +80,7 @@ const isWorkerForked = [];
         console.info(`Master ${PROCESS.pid} is running...!`); // Log the master process ID
 
         /* Connect to MongoDB Database in the master process */
-        ConnectDatabase().then(() => {
+        CONNECT_DATABASE().then(() => {
             for (let i = 0; i < totalCPUs; i++) {
                 CLUSTER.fork();
             }

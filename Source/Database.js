@@ -12,7 +12,7 @@ let isConnected = false;
 const MongoDB_URI = PROCESS.env.MongoDB_URI;
 
 /********************* Connect To MongoDB *********************/
-const ConnectDatabase = async () => {
+const CONNECT_DATABASE = async () => {
     if (isConnected) {
         console.log("Already connected to MongoDB");
         return;
@@ -34,4 +34,4 @@ const ConnectDatabase = async () => {
 }
 
 /********************* Export the ConnectDatabase function *********************/
-export { ConnectDatabase };
+export { CONNECT_DATABASE };
