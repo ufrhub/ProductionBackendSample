@@ -88,4 +88,4 @@ App.use((Request, Response, Next) => {
 });
 
 /********************* Export the Express App *********************/
-export default App;
+export { App };

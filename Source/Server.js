@@ -7,8 +7,8 @@ import OPERATING_SYSTEM from "node:os";
 import PROCESS from "node:process";
 
 /********************* Import the required files and functions *********************/
-import ConnectDatabase from "./Database.js";
-import App from "./App.js";
+import { ConnectDatabase } from "./Database.js";
+import { App } from "./App.js";
 import { ONLINE, MESSAGE, SHUTDOWN, UNHANDLED_REJECTION, UNCAUGHT_EXCEPTION, DATABASE_CONNECTED, EXIT, ERROR, SIGTERM, SIGINT, DISCONNECT, LISTENING, FORK } from "./Constants.js";
 
 /********************* Get the directory name of the current module *********************/
