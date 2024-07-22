@@ -3,6 +3,7 @@ import DOTENV from "dotenv";
 import PATH from "path";
 import URL from 'url';
 import EXPRESS from "express";
+import COOKIE_PARSER from "cookie-parser";
 import PROCESS from "node:process";
 import CORS from "cors";
 import HELMET from "helmet";
@@ -24,8 +25,17 @@ import TestRouters from "./Routes/TestRouters.js";
 /********************* Create an instance of the Express application *********************/
 const APPLICATION = EXPRESS();
 
-/********************* Use middleware to parse JSON requests *********************/
-APPLICATION.use(EXPRESS.json());
+/********************* Use EXPRESS.json middleware to parse JSON requests with a body size limit of 16kb *********************/
+APPLICATION.use(EXPRESS.json({ limit: "16kb" }));
+
+/********************* Use EXPRESS.urlencoded middleware to parse incoming URL-encoded requests with a body size limit of 16kb *********************/
+APPLICATION.use(EXPRESS.urlencoded({ extended: true, limit: "16kb" }));
+
+/********************* Serve static files from the "public" directory *********************/
+APPLICATION.use(EXPRESS.static("public"));
+
+/********************* Use the COOKIE_PARSER middleware to parse cookies attached to the client request object *********************/
+APPLICATION.use(COOKIE_PARSER());
 
 /********************* Define allowed origins for CORS from environment variables or default to localhost *********************/
 const AllowedOrigins = PROCESS.env.CORS_ORIGINS ? PROCESS.env.CORS_ORIGINS.split(',') : ['http://localhost:3000'];
