@@ -49,9 +49,9 @@ if (PROCESS.platform === 'win32') {
 /********************* Handle the Cluster functionality *********************/
 (() => {
     if (CLUSTER.isPrimary) {
-        console.info(`Primary Worker ${PROCESS.pid} is running...!`); // Log the master process ID
+        console.info(`Primary Worker ${PROCESS.pid} is running...!`); // Log the Primary Worker process ID
 
-        /* Connect to MongoDB Database in the master process */
+        /* Connect to MongoDB Database in the Primary Worker process */
         CONNECT_DATABASE().then(() => {
             for (let i = 0; i < totalCPUs; i++) {
                 if (i % 3 !== 0) {
@@ -99,14 +99,14 @@ if (PROCESS.platform === 'win32') {
             CLUSTER.fork();
         });
 
-        /* Triggered When: The master receives a message from a worker. */
+        /* Triggered When: The Primary Worker receives a message from a worker. */
         CLUSTER.on(MESSAGE, (worker, message, handle) => {
-            console.log(`Master received message from worker ${worker.process.pid}: ${message}`);
+            console.log(`Primary Worker received message from worker ${worker.process.pid}: ${message}`);
         });
 
         /* Gracefully shutdown workers function to handle gracefully shutdown workers */
         const GracefullyShutdownWorkers = (signal) => {
-            console.info(`Master ${PROCESS.pid} received signal: ${signal}. Shutting Down...!`);
+            console.info(`Primary Worker ${PROCESS.pid} received signal: ${signal}. Shutting Down...!`);
             /* Iterate over all worker processesr */
             Object.values(CLUSTER.workers).forEach((worker) => {
                 /* Send a shutdown message to each worker */
@@ -114,7 +114,7 @@ if (PROCESS.platform === 'win32') {
                     worker.send(SHUTDOWN);
                 }
             });
-            /* Wait for workers to shutdown gracefully before exiting the master process */
+            /* Wait for workers to shutdown gracefully before exiting the Primary Worker process */
             setTimeout(() => {
                 PROCESS.exit(0);
             }, 10000);
@@ -133,7 +133,7 @@ if (PROCESS.platform === 'win32') {
         /* Get the worker role from the cluster fork env */
         const WorkerRole = PROCESS.env.ROLE;
 
-        /* Listen for messages from the master process */
+        /* Listen for messages from the Primary Worker process */
         PROCESS.on(MESSAGE, (message) => {
             if (message === DATABASE_CONNECTED) {
                 /* Start the server */

@@ -18,6 +18,9 @@ import {
     UNCAUGHT_EXCEPTION
 } from "./Utilities/Constants.js";
 
+/********************* Import The Routers *********************/
+import TestRouters from "./Routes/TestRouters.js";
+
 /********************* Get the directory name of the current module *********************/
 const __filename = URL.fileURLToPath(import.meta.url);
 const __dirname = PATH.dirname(__filename);
@@ -26,9 +29,6 @@ const __dirname = PATH.dirname(__filename);
 DOTENV.config({
     path: PATH.resolve(__dirname, '../.env')
 });
-
-/********************* Import The Routers *********************/
-import TestRouters from "./Routes/TestRouters.js";
 
 /********************* Create an instance of the Express application *********************/
 const APPLICATION = EXPRESS();
