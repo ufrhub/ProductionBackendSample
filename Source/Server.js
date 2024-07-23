@@ -137,7 +137,9 @@ if (PROCESS.platform === 'win32') {
         PROCESS.on(MESSAGE, (message) => {
             if (message === DATABASE_CONNECTED) {
                 /* Start the server */
-                START_EXPRESS_SERVER();
+                if (WorkerRole === HTTP) {
+                    START_EXPRESS_SERVER();
+                }
             }
 
             if (message === SHUTDOWN) {
