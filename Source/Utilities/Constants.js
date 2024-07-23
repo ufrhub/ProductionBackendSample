@@ -14,3 +14,5 @@ export const UNCAUGHT_EXCEPTION = "uncaughtException";
 export const DATABASE_CONNECTED = "DatabaseConnected";
 export const SIGTERM = "SIGTERM";
 export const SIGINT = "SIGINT";
+export const HTTP = "HTTP";
+export const WEB_SOCKET = "WEB_SOCKET";

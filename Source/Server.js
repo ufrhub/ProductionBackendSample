@@ -8,21 +8,21 @@ import PROCESS from "node:process";
 
 /********************* Import the required files and functions *********************/
 import { CONNECT_DATABASE } from "./Database.js";
-import { APPLICATION } from "./Application.js";
 import {
     ONLINE,
     MESSAGE,
     SHUTDOWN,
-    UNHANDLED_REJECTION,
-    UNCAUGHT_EXCEPTION,
     DATABASE_CONNECTED,
     EXIT,
     SIGTERM,
     SIGINT,
     DISCONNECT,
     LISTENING,
-    FORK
+    FORK,
+    HTTP,
+    WEB_SOCKET
 } from "./Utilities/Constants.js";
+import { START_EXPRESS_SERVER } from "./ExpressServer.js";
 
 /********************* Get the directory name of the current module *********************/
 const __filename = URL.fileURLToPath(import.meta.url);
@@ -32,54 +32,6 @@ const __dirname = PATH.dirname(__filename);
 DOTENV.config({
     path: PATH.resolve(__dirname, '../.env')
 });
-
-/********************* Set the port from environment variables or default to 7000 *********************/
-const PORT = PROCESS.env.PORT || 7000;
-
-/********************* Function to start the Express Server *********************/
-const StartServer = async () => {
-    try {
-        /* Start the server and listen on the specified port. Log the server and worker information. */
-        const Server = await APPLICATION.listen((PORT), () => {
-            console.info({
-                worker: `Worker ${PROCESS.pid} started`,
-                server: `Server is running on PORT = ${PORT}`,
-            });
-        });
-
-        /* Define a function for graceful shutdown, which takes an exit code as a parameter. */
-        const GracefullyShutdownServer = (exitCode) => {
-            console.info(`Worker ${PROCESS.pid} is shutting down...!`);
-            Server.close(() => {
-                console.log(`Worker ${PROCESS.pid} has shut down...!`);
-                PROCESS.exit(exitCode);
-            });
-        }
-
-        /* Listen for 'message' events on the process. */
-        PROCESS.on(MESSAGE, (message) => {
-            // Handle shutdown requests.
-            if (message === SHUTDOWN) {
-                GracefullyShutdownServer(0); // Gracefully shut down with exit code 0.
-            }
-        });
-
-        /* Handle unhandled promise rejections. */
-        PROCESS.on(UNHANDLED_REJECTION, (reason, promise) => {
-            console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-            GracefullyShutdownServer(1); // Gracefully shut down with exit code 1.
-        });
-
-        /* Handle uncaught exceptions. */
-        PROCESS.on(UNCAUGHT_EXCEPTION, (error) => {
-            console.error(`Uncaught Exception: ${error}`);
-            GracefullyShutdownServer(1); // Gracefully shut down with exit code 1.
-        });
-    } catch (error) {
-        console.error(`Error starting server: ${error.message}`); // Log any error that occurs while starting the server.
-        PROCESS.exit(1); // Exit the process with an error code.
-    }
-}
 
 /********************* Get the number of CPU cores available *********************/
 const totalCPUs = OPERATING_SYSTEM.cpus().length;
@@ -102,7 +54,11 @@ if (PROCESS.platform === 'win32') {
         /* Connect to MongoDB Database in the master process */
         CONNECT_DATABASE().then(() => {
             for (let i = 0; i < totalCPUs; i++) {
-                CLUSTER.fork();
+                if (i % 3 !== 0) {
+                    CLUSTER.fork({ ROLE: HTTP }); // Env to handle HTTP Requests
+                } else {
+                    CLUSTER.fork({ ROLE: WEB_SOCKET }); // Env to handle WebSocket Requests
+                }
             }
         }).catch((error) => {
             console.error({
@@ -174,11 +130,14 @@ if (PROCESS.platform === 'win32') {
             GracefullyShutdownWorkers(SIGINT);
         });
     } else if (CLUSTER.isWorker) {
+        /* Get the worker role from the cluster fork env */
+        const WorkerRole = PROCESS.env.ROLE;
+
         /* Listen for messages from the master process */
         PROCESS.on(MESSAGE, (message) => {
             if (message === DATABASE_CONNECTED) {
                 /* Start the server */
-                StartServer();
+                START_EXPRESS_SERVER();
             }
 
             if (message === SHUTDOWN) {
