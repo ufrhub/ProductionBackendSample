@@ -87,10 +87,17 @@ const totalCPUs = OPERATING_SYSTEM.cpus().length;
 /********************* Store the forked workers *********************/
 const isWorkerForked = [];
 
+/********************* Set the Cluster scheduling policy *********************/
+if (PROCESS.platform === 'win32') {
+    CLUSTER.schedulingPolicy = CLUSTER.SCHED_RR; // Set to Round-Robin
+} else {
+    CLUSTER.schedulingPolicy = CLUSTER.SCHED_NONE; // Leave it to the Operating System
+}
+
 /********************* Handle the Cluster functionality *********************/
 (() => {
-    if (CLUSTER.isMaster) {
-        console.info(`Master ${PROCESS.pid} is running...!`); // Log the master process ID
+    if (CLUSTER.isPrimary) {
+        console.info(`Primary Worker ${PROCESS.pid} is running...!`); // Log the master process ID
 
         /* Connect to MongoDB Database in the master process */
         CONNECT_DATABASE().then(() => {
@@ -166,7 +173,7 @@ const isWorkerForked = [];
         PROCESS.on(SIGINT, () => {
             GracefullyShutdownWorkers(SIGINT);
         });
-    } else {
+    } else if (CLUSTER.isWorker) {
         /* Listen for messages from the master process */
         PROCESS.on(MESSAGE, (message) => {
             if (message === DATABASE_CONNECTED) {
