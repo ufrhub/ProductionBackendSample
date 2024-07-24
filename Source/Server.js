@@ -38,7 +38,7 @@ DOTENV.config({
 const totalCPUs = OPERATING_SYSTEM.cpus().length;
 
 /********************* Store the forked workers *********************/
-const isWorkerForked = [];
+const ForkedWorkers = [];
 
 /********************* Set the Cluster scheduling policy *********************/
 if (PROCESS.platform === 'win32') {
@@ -74,28 +74,20 @@ if (PROCESS.platform === 'win32') {
 
         /* Triggered When: A new worker process is created. */
         CLUSTER.on(FORK, (worker) => {
-            LOG_INFO({
-                label: "Worker",
-                service: "Fork",
-                message: `Worker ${worker.process.pid} forked`,
-            });
-            isWorkerForked.push(worker.process.pid);
+            ForkedWorkers.push(worker.process.pid);
         });
 
         /* Triggered When: A worker process is fully online and ready to handle tasks. */
         CLUSTER.on(ONLINE, (worker) => {
-            LOG_INFO({
-                label: "Worker",
-                service: "Online",
-                message: `Worker ${worker.process.pid} is online`,
-            });
-            if (isWorkerForked.includes(worker.process.pid)) {
+            if (ForkedWorkers.includes(worker.process.pid)) {
                 worker.send(DATABASE_CONNECTED);
             }
         });
 
         /* Triggered When: A worker starts listening for connections on a specified address and port. */
         CLUSTER.on(LISTENING, (worker, address) => {
+            if (ForkedWorkers.includes(worker.process.pid)) return;
+
             LOG_INFO({
                 label: "Worker",
                 service: "Listening",
