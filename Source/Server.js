@@ -23,7 +23,7 @@ import {
     FORK,
 } from "./Utilities/Constants.js";
 import APPLICATION from "./Application.js";
-import { LOG_INFO, LOG_ERROR, LOG_WARN } from "./WinstonLogger.js";
+import { LOG_ERROR, LOG_WARN, LOG_INFO } from "./Utilities/WinstonLogger.js";
 
 /********************* Get the directory name of the current module *********************/
 const __filename = URL.fileURLToPath(import.meta.url);
