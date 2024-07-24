@@ -73,6 +73,9 @@ APPLICATION.use(MORGAN('combined')); // Use 'combined' for more detailed logs
 APPLICATION.use(Limiter);
 
 /********************* Declare the Routes *********************/
+APPLICATION.get('/health', (Request, Response) => {
+    Response.status(200).send('OK');
+});
 APPLICATION.use("/api/v1", TestRouters);
 
 /********************* Error handling middleware *********************/
