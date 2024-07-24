@@ -1,4 +1,7 @@
 /********************* Import the required Packages *********************/
+import DOTENV from "dotenv";
+import PATH from "path";
+import URL from 'url';
 import EXPRESS from "express";
 import COOKIE_PARSER from "cookie-parser";
 import PROCESS from "node:process";
@@ -20,6 +23,15 @@ import {
 
 /********************* Import The Routers *********************/
 import TestRouters from "./Routes/TestRouters.js";
+
+/********************* Get the directory name of the current module *********************/
+const __filename = URL.fileURLToPath(import.meta.url);
+const __dirname = PATH.dirname(__filename);
+
+/********************* Load environment variables from .env file *********************/
+DOTENV.config({
+    path: PATH.resolve(__dirname, '../.env')
+});
 
 /********************* Create an instance of the Express application *********************/
 const APPLICATION = EXPRESS();

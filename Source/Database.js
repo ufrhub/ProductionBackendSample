@@ -1,9 +1,21 @@
 /********************* Import the required Packages *********************/
+import DOTENV from "dotenv";
+import PATH from "path";
+import URL from 'url';
 import MONGOOSE from "mongoose";
 import PROCESS from "node:process";
 
 /********************* Import the required files and functions *********************/
 import { DATABASE_NAME } from "./Utilities/Constants.js";
+
+/********************* Get the directory name of the current module *********************/
+const __filename = URL.fileURLToPath(import.meta.url);
+const __dirname = PATH.dirname(__filename);
+
+/********************* Load environment variables from .env file *********************/
+DOTENV.config({
+    path: PATH.resolve(__dirname, '../.env')
+});
 
 /********************* Connection State *********************/
 let isConnected = false;
