@@ -19,10 +19,8 @@ import {
     DISCONNECT,
     LISTENING,
     FORK,
-    HTTP,
-    WEB_SOCKET
 } from "./Utilities/Constants.js";
-import { START_EXPRESS_SERVER } from "./ExpressServer.js";
+import APPLICATION from "./Application.js";
 
 /********************* Get the directory name of the current module *********************/
 const __filename = URL.fileURLToPath(import.meta.url);
@@ -54,11 +52,7 @@ if (PROCESS.platform === 'win32') {
         /* Connect to MongoDB Database in the Primary Worker process */
         CONNECT_DATABASE().then(() => {
             for (let i = 0; i < totalCPUs; i++) {
-                if (i % 3 !== 0) {
-                    CLUSTER.fork({ ROLE: HTTP }); // Env to handle HTTP Requests
-                } else {
-                    CLUSTER.fork({ ROLE: WEB_SOCKET }); // Env to handle WebSocket Requests
-                }
+                CLUSTER.fork();
             }
         }).catch((error) => {
             console.error({
@@ -130,22 +124,22 @@ if (PROCESS.platform === 'win32') {
             GracefullyShutdownWorkers(SIGINT);
         });
     } else if (CLUSTER.isWorker) {
-        /* Get the worker role from the cluster fork env */
-        const WorkerRole = PROCESS.env.ROLE;
-
         /* Listen for messages from the Primary Worker process */
         PROCESS.on(MESSAGE, (message) => {
-            if (message === DATABASE_CONNECTED) {
-                /* Start the server */
-                if (WorkerRole === HTTP) {
-                    START_EXPRESS_SERVER();
+            try {
+                if (message === DATABASE_CONNECTED) {
+                    /* Start the server */
+                    APPLICATION.StartServer();
                 }
-            }
 
-            if (message === SHUTDOWN) {
-                console.info(`Worker ${PROCESS.pid} has shut down...!`);
-                /* Exit the worker process */
-                PROCESS.exit(0);
+                if (message === SHUTDOWN) {
+                    console.info(`Worker ${PROCESS.pid} has shut down...!`);
+                    /* Exit the worker process */
+                    PROCESS.exit(0);
+                }
+            } catch (error) {
+                /* Log the error message */
+                console.error(error.message);
             }
         });
     }

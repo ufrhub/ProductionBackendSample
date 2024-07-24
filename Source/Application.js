@@ -89,7 +89,7 @@ APPLICATION.use((Request, Response, Next) => {
 const PORT = PROCESS.env.PORT || 7000;
 
 /********************* Function to start the Express Server *********************/
-const START_EXPRESS_SERVER = async () => {
+const StartServer = async () => {
     try {
         /* Start the server and listen on the specified port. Log the server and worker information. */
         const Server = await APPLICATION.listen((PORT), () => {
@@ -134,4 +134,4 @@ const START_EXPRESS_SERVER = async () => {
 }
 
 /********************* Export the Express App *********************/
-export { APPLICATION, START_EXPRESS_SERVER };
+export default { APPLICATION, StartServer };
