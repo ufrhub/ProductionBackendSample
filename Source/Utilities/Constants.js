@@ -7,6 +7,7 @@ export const FORK = "fork";
 export const LISTENING = "listening";
 export const DISCONNECT = "disconnect";
 export const EXIT = "exit";
+export const ERROR = "errror";
 export const MESSAGE = "message";
 export const SHUTDOWN = "shutdown";
 export const UNHANDLED_REJECTION = "unhandledRejection";

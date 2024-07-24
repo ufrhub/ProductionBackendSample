@@ -9,6 +9,7 @@ import MORGAN from "morgan";
 
 /********************* Import the required files and functions *********************/
 import {
+    ERROR,
     MESSAGE,
     SHUTDOWN,
     UNHANDLED_REJECTION,
@@ -91,6 +92,12 @@ const PORT = PROCESS.env.PORT || 7000;
 /********************* Function to start the Express Server *********************/
 const StartServer = async () => {
     try {
+        /* Handle Application-specific Errors */
+        APPLICATION.on(ERROR, (error) => {
+            console.log("Application Error: ", error);
+            throw error;
+        });
+
         /* Start the server and listen on the specified port. Log the server and worker information. */
         const Server = await APPLICATION.listen((PORT), () => {
             console.info({
