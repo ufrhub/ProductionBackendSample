@@ -14,6 +14,8 @@ import {
     SHUTDOWN,
     DATABASE_CONNECTED,
     EXIT,
+    UNHANDLED_REJECTION,
+    UNCAUGHT_EXCEPTION,
     SIGTERM,
     SIGINT,
     DISCONNECT,
@@ -99,7 +101,7 @@ if (PROCESS.platform === 'win32') {
         });
 
         /* Gracefully shutdown workers function to handle gracefully shutdown workers */
-        const GracefullyShutdownWorkers = (signal) => {
+        const GracefullyShutdownWorkers = (signal, exitCode = 0) => {
             console.info(`Primary Worker ${PROCESS.pid} received signal: ${signal}. Shutting Down...!`);
             /* Iterate over all worker processesr */
             Object.values(CLUSTER.workers).forEach((worker) => {
@@ -110,9 +112,21 @@ if (PROCESS.platform === 'win32') {
             });
             /* Wait for workers to shutdown gracefully before exiting the Primary Worker process */
             setTimeout(() => {
-                PROCESS.exit(0);
+                PROCESS.exit(exitCode);
             }, 10000);
         }
+
+        /* Handle unhandled promise rejections. */
+        PROCESS.on(UNHANDLED_REJECTION, (reason, promise) => {
+            console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+            GracefullyShutdownWorkers(UNHANDLED_REJECTION, 1);
+        });
+
+        /* Handle uncaught exceptions. */
+        PROCESS.on(UNCAUGHT_EXCEPTION, (error) => {
+            console.error(`Uncaught Exception: ${error}`);
+            GracefullyShutdownWorkers(UNCAUGHT_EXCEPTION, 1);
+        });
 
         /* Triggered: SIGTERM is typically sent to request a process to terminate. */
         PROCESS.on(SIGTERM, () => {

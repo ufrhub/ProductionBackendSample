@@ -13,7 +13,9 @@ import {
     MESSAGE,
     SHUTDOWN,
     UNHANDLED_REJECTION,
-    UNCAUGHT_EXCEPTION
+    UNCAUGHT_EXCEPTION,
+    SIGTERM,
+    SIGINT,
 } from "./Utilities/Constants.js";
 
 /********************* Import The Routers *********************/
@@ -29,7 +31,7 @@ APPLICATION.use(EXPRESS.json({ limit: "16kb" }));
 APPLICATION.use(EXPRESS.urlencoded({ extended: true, limit: "16kb" }));
 
 /********************* Serve static files from the "public" directory *********************/
-APPLICATION.use(EXPRESS.static("public"));
+APPLICATION.use('/static', EXPRESS.static("public"));
 
 /********************* Use the COOKIE_PARSER middleware to parse cookies attached to the client request object *********************/
 APPLICATION.use(COOKIE_PARSER());
@@ -136,6 +138,16 @@ const StartServer = async () => {
         PROCESS.on(UNCAUGHT_EXCEPTION, (error) => {
             console.error(`Uncaught Exception: ${error}`);
             GracefullyShutdownServer(1); // Gracefully shut down with exit code 1.
+        });
+
+        /* Triggered: SIGTERM is typically sent to request a process to terminate. */
+        PROCESS.on(SIGTERM, () => {
+            GracefullyShutdownServer(0); // Gracefully shut down with exit code 0.
+        });
+
+        /* Triggered: SIGINT is typically sent when a user interrupts a process from the terminal, usually by pressing Ctrl+C. */
+        PROCESS.on(SIGINT, () => {
+            GracefullyShutdownServer(0); // Gracefully shut down with exit code 0.
         });
     } catch (error) {
         console.error(`Error starting server: ${error.message}`); // Log any error that occurs while starting the server.
