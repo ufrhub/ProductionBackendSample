@@ -23,7 +23,7 @@ import {
     FORK,
 } from "./Utilities/Constants.js";
 import APPLICATION from "./Application.js";
-import { LOGGER } from "./WinstonLogger.js";
+import { LOG_INFO, LOG_ERROR, LOG_WARN } from "./WinstonLogger.js";
 
 /********************* Get the directory name of the current module *********************/
 const __filename = URL.fileURLToPath(import.meta.url);
@@ -50,7 +50,11 @@ if (PROCESS.platform === 'win32') {
 /********************* Handle the Cluster functionality *********************/
 (() => {
     if (CLUSTER.isPrimary) {
-        LOGGER.info(`Primary Worker ${PROCESS.pid} is running...!`); // Log the Primary Worker process ID
+        LOG_INFO({
+            label: "Cluster.isPrimary",
+            service: "Primary Worker",
+            message: `Primary Worker ${PROCESS.pid} is running...!`,
+        }); // Log the Primary Worker process ID
 
         /* Connect to MongoDB Database in the Primary Worker process */
         CONNECT_DATABASE().then(() => {
@@ -58,21 +62,33 @@ if (PROCESS.platform === 'win32') {
                 CLUSTER.fork();
             }
         }).catch((error) => {
-            LOGGER.error({
-                error: error,
-                message: `An error occured while connection to the Database`,
+            LOG_ERROR({
+                label: "Database",
+                service: "Connection",
+                error: {
+                    error: error.message,
+                    message: `An error occured while connection to the Database`,
+                },
             });
         });
 
         /* Triggered When: A new worker process is created. */
         CLUSTER.on(FORK, (worker) => {
-            LOGGER.info(`Worker ${worker.process.pid} forked`);
+            LOG_INFO({
+                label: "Worker",
+                service: "Fork",
+                message: `Worker ${worker.process.pid} forked`,
+            });
             isWorkerForked.push(worker.process.pid);
         });
 
         /* Triggered When: A worker process is fully online and ready to handle tasks. */
         CLUSTER.on(ONLINE, (worker) => {
-            LOGGER.info(`Worker ${worker.process.pid} is online`);
+            LOG_INFO({
+                label: "Worker",
+                service: "Online",
+                message: `Worker ${worker.process.pid} is online`,
+            });
             if (isWorkerForked.includes(worker.process.pid)) {
                 worker.send(DATABASE_CONNECTED);
             }
@@ -80,17 +96,29 @@ if (PROCESS.platform === 'win32') {
 
         /* Triggered When: A worker starts listening for connections on a specified address and port. */
         CLUSTER.on(LISTENING, (worker, address) => {
-            LOGGER.info(`Worker ${worker.process.pid} is listening on ${address.address}:${address.port}`);
+            LOG_INFO({
+                label: "Worker",
+                service: "Listening",
+                message: `Worker ${worker.process.pid} is listening on ${address.address}:${address.port}`,
+            });
         });
 
         /* Triggered When: A worker's IPC channel has disconnected. */
         CLUSTER.on(DISCONNECT, (worker) => {
-            LOGGER.info(`Worker ${worker.process.pid} disconnected`);
+            LOG_WARN({
+                label: "Worker",
+                service: "Disconnect",
+                message: `Worker ${worker.process.pid} disconnected`,
+            });
         });
 
         /* Triggered When: A worker process exits. */
         CLUSTER.on(EXIT, (worker, code, signal) => {
-            LOGGER.info(`Worker ${worker.process.pid} exited with code ${code} and signal ${signal}`); // Log worker exit details
+            LOG_WARN({
+                label: "Worker",
+                service: "Exit",
+                message: `Worker ${worker.process.pid} exited with code ${code} and signal ${signal}`,
+            }); // Log worker exit details
             // -- Optionally restart the worker
             /* Fork a new worker process to replace the one that exited */
             CLUSTER.fork();
@@ -98,12 +126,20 @@ if (PROCESS.platform === 'win32') {
 
         /* Triggered When: The Primary Worker receives a message from a worker. */
         CLUSTER.on(MESSAGE, (worker, message, handle) => {
-            LOGGER.info(`Primary Worker received message from worker ${worker.process.pid}: ${message}`);
+            LOG_INFO({
+                label: "Cluster",
+                service: "Message",
+                message: `Primary Worker received message from worker ${worker.process.pid}: ${message}`,
+            });
         });
 
         /* Gracefully shutdown workers function to handle gracefully shutdown workers */
         const GracefullyShutdownWorkers = (signal, exitCode = 0) => {
-            LOGGER.info(`Primary Worker ${PROCESS.pid} received signal: ${signal}. Shutting Down...!`);
+            LOG_WARN({
+                label: "Workers",
+                service: "Shutdown",
+                message: `Primary Worker ${PROCESS.pid} received signal: ${signal}. Shutting Down...!`,
+            });
             /* Iterate over all worker processesr */
             Object.values(CLUSTER.workers).forEach((worker) => {
                 /* Send a shutdown message to each worker */
@@ -119,13 +155,21 @@ if (PROCESS.platform === 'win32') {
 
         /* Handle unhandled promise rejections. */
         PROCESS.on(UNHANDLED_REJECTION, (reason, promise) => {
-            LOGGER.error('Unhandled Rejection at:', promise, 'reason:', reason);
+            LOG_ERROR({
+                label: "Unhandled Rejection",
+                service: "Error",
+                error: `Unhandled Rejection at: ${promise} reason: ${reason}`,
+            });
             GracefullyShutdownWorkers(UNHANDLED_REJECTION, 1);
         });
 
         /* Handle uncaught exceptions. */
         PROCESS.on(UNCAUGHT_EXCEPTION, (error) => {
-            LOGGER.error(`Uncaught Exception: ${error}`);
+            LOG_ERROR({
+                label: "Uncaught",
+                service: "Error",
+                error: `Uncaught Exception: ${error}`,
+            });
             GracefullyShutdownWorkers(UNCAUGHT_EXCEPTION, 1);
         });
 
@@ -148,13 +192,21 @@ if (PROCESS.platform === 'win32') {
                 }
 
                 if (message === SHUTDOWN) {
-                    LOGGER.info(`Worker ${PROCESS.pid} has shut down...!`);
+                    LOG_INFO({
+                        label: "Worker",
+                        service: "Shutdown",
+                        message: `Worker ${PROCESS.pid} has shut down...!`,
+                    });
                     /* Exit the worker process */
                     PROCESS.exit(0);
                 }
             } catch (error) {
                 /* Log the error message */
-                LOGGER.error(error.message);
+                LOG_ERROR({
+                    label: "Worker",
+                    service: "Message",
+                    error: error.message,
+                });
             }
         });
     }
