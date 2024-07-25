@@ -1,5 +1,5 @@
 /********************* Import the required Packages *********************/
-import WEB_SOCKET, { WebSocketServer } from "ws";
+import { WebSocketServer } from "ws";
 import PROCESS from "node:process";
 
 /********************* Import the required files and functions *********************/
@@ -11,7 +11,7 @@ import {
 } from "./Utilities/Constants.js";
 import { LOG_ERROR, LOG_INFO } from "./Utilities/WinstonLogger.js";
 
-/********************* Import the required files and functions *********************/
+/********************* Start the Web Socket Server *********************/
 const START_WEB_SOCKET_SERVER = (Server) => {
     const WEB_SOCKET_SERVER = new WebSocketServer({ server: Server }, () => {
         LOG_INFO({
