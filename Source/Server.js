@@ -51,7 +51,7 @@ if (PROCESS.platform === 'win32') {
 (() => {
     if (CLUSTER.isPrimary) {
         LOG_INFO({
-            label: "Cluster.isPrimary",
+            label: "Server.js",
             service: "Primary Worker",
             message: `Primary Worker ${PROCESS.pid} is running...!`,
         }); // Log the Primary Worker process ID
@@ -63,7 +63,7 @@ if (PROCESS.platform === 'win32') {
             }
         }).catch((error) => {
             LOG_ERROR({
-                label: "Database",
+                label: "Server.js",
                 service: "Connection",
                 error: {
                     error: error.message,
@@ -89,7 +89,7 @@ if (PROCESS.platform === 'win32') {
             if (ForkedWorkers.includes(worker.process.pid)) return;
 
             LOG_INFO({
-                label: "Worker",
+                label: "Server.js",
                 service: "Listening",
                 message: `Worker ${worker.process.pid} is listening on ${address.address}:${address.port}`,
             });
@@ -98,7 +98,7 @@ if (PROCESS.platform === 'win32') {
         /* Triggered When: A worker's IPC channel has disconnected. */
         CLUSTER.on(DISCONNECT, (worker) => {
             LOG_WARN({
-                label: "Worker",
+                label: "Server.js",
                 service: "Disconnect",
                 message: `Worker ${worker.process.pid} disconnected`,
             });
@@ -107,7 +107,7 @@ if (PROCESS.platform === 'win32') {
         /* Triggered When: A worker process exits. */
         CLUSTER.on(EXIT, (worker, code, signal) => {
             LOG_WARN({
-                label: "Worker",
+                label: "Server.js",
                 service: "Exit",
                 message: `Worker ${worker.process.pid} exited with code ${code} and signal ${signal}`,
             }); // Log worker exit details
@@ -119,8 +119,8 @@ if (PROCESS.platform === 'win32') {
         /* Triggered When: The Primary Worker receives a message from a worker. */
         CLUSTER.on(MESSAGE, (worker, message, handle) => {
             LOG_INFO({
-                label: "Cluster",
-                service: "Message",
+                label: "Server.js",
+                service: "Primary Worker Message",
                 message: `Primary Worker received message from worker ${worker.process.pid}: ${message}`,
             });
         });
@@ -128,8 +128,8 @@ if (PROCESS.platform === 'win32') {
         /* Gracefully shutdown workers function to handle gracefully shutdown workers */
         const GracefullyShutdownWorkers = (signal, exitCode = 0) => {
             LOG_WARN({
-                label: "Workers",
-                service: "Shutdown",
+                label: "Server.js",
+                service: "GracefullyShutdownWorkers",
                 message: `Primary Worker ${PROCESS.pid} received signal: ${signal}. Shutting Down...!`,
             });
             /* Iterate over all worker processesr */
@@ -148,8 +148,8 @@ if (PROCESS.platform === 'win32') {
         /* Handle unhandled promise rejections. */
         PROCESS.on(UNHANDLED_REJECTION, (reason, promise) => {
             LOG_ERROR({
-                label: "Unhandled Rejection",
-                service: "Error",
+                label: "Server.js",
+                service: "Unhandled Rejection",
                 error: `Unhandled Rejection at: ${promise} reason: ${reason}`,
             });
             GracefullyShutdownWorkers(UNHANDLED_REJECTION, 1);
@@ -158,8 +158,8 @@ if (PROCESS.platform === 'win32') {
         /* Handle uncaught exceptions. */
         PROCESS.on(UNCAUGHT_EXCEPTION, (error) => {
             LOG_ERROR({
-                label: "Uncaught",
-                service: "Error",
+                label: "Server.js",
+                service: "Uncaught Error",
                 error: `Uncaught Exception: ${error}`,
             });
             GracefullyShutdownWorkers(UNCAUGHT_EXCEPTION, 1);
@@ -185,8 +185,8 @@ if (PROCESS.platform === 'win32') {
 
                 if (message === SHUTDOWN) {
                     LOG_INFO({
-                        label: "Worker",
-                        service: "Shutdown",
+                        label: "Server.js",
+                        service: "Shutdown Worker",
                         message: `Worker ${PROCESS.pid} has shut down...!`,
                     });
                     /* Exit the worker process */
@@ -195,8 +195,8 @@ if (PROCESS.platform === 'win32') {
             } catch (error) {
                 /* Log the error message */
                 LOG_ERROR({
-                    label: "Worker",
-                    service: "Message",
+                    label: "Server.js",
+                    service: "Message Catch",
                     error: error.message,
                 });
             }
