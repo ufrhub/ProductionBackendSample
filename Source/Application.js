@@ -1,7 +1,7 @@
 /********************* Import the required Packages *********************/
 import DOTENV from "dotenv";
-import PATH from "path";
-import URL from 'url';
+import PATH from "node:path";
+import URL from 'node:url';
 import EXPRESS from "express";
 import HTTP from "node:http";
 import COOKIE_PARSER from "cookie-parser";
