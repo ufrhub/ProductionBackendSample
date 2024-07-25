@@ -107,7 +107,7 @@ APPLICATION.use((Request, Response, Next) => {
 const PORT = PROCESS.env.PORT || 7000;
 
 /********************* Function to start the Express Server *********************/
-const StartServer = async () => {
+const START_SERVER = async () => {
     try {
         /* Handle Application-specific Errors */
         APPLICATION.on(ERROR, (error) => {
@@ -168,4 +168,4 @@ const StartServer = async () => {
 }
 
 /********************* Export the Express App *********************/
-export default { APPLICATION, StartServer };
+export { APPLICATION, START_SERVER };

@@ -22,7 +22,7 @@ import {
     LISTENING,
     FORK,
 } from "./Utilities/Constants.js";
-import APPLICATION from "./Application.js";
+import { START_SERVER } from "./Application.js";
 import { LOG_ERROR, LOG_WARN, LOG_INFO } from "./Utilities/WinstonLogger.js";
 
 /********************* Get the directory name of the current module *********************/
@@ -180,7 +180,7 @@ if (PROCESS.platform === 'win32') {
             try {
                 if (message === DATABASE_CONNECTED) {
                     /* Start the server */
-                    APPLICATION.StartServer();
+                    START_SERVER();
                 }
 
                 if (message === SHUTDOWN) {
