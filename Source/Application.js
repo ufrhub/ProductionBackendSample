@@ -3,6 +3,7 @@ import DOTENV from "dotenv";
 import PATH from "path";
 import URL from 'url';
 import EXPRESS from "express";
+import HTTP from "node:http";
 import COOKIE_PARSER from "cookie-parser";
 import PROCESS from "node:process";
 import CORS from "cors";
@@ -20,6 +21,7 @@ import {
     SIGTERM,
     SIGINT,
 } from "./Utilities/Constants.js";
+import { START_WEB_SOCKET_SERVER } from "./WebSocket.js";
 
 /********************* Import The Routers *********************/
 import TestRouters from "./Routes/TestRouters.js";
@@ -106,6 +108,9 @@ APPLICATION.use((Request, Response, Next) => {
 /********************* Set the port from environment variables or default to 7000 *********************/
 const PORT = PROCESS.env.PORT || 7000;
 
+/********************* Create an HTTP server using the Express application instance *********************/
+const HTTP_SERVER = HTTP.createServer(APPLICATION);
+
 /********************* Function to start the Express Server *********************/
 const START_SERVER = async () => {
     try {
@@ -115,8 +120,11 @@ const START_SERVER = async () => {
             throw error;
         });
 
-        /* Start the server and listen on the specified port. Log the server and worker information. */
-        const Server = await APPLICATION.listen((PORT), () => {
+        /* Start the web socket server. */
+        START_WEB_SOCKET_SERVER(HTTP_SERVER);
+
+        /* Start the http server and listen on the specified port. Log the server and worker information. */
+        const Server = await HTTP_SERVER.listen((PORT), () => {
             console.info({
                 worker: `Worker ${PROCESS.pid} started`,
                 server: `Server is running on PORT = ${PORT}`,

@@ -1,5 +1,5 @@
 /********************* Import the required Packages *********************/
-import WEB_SOCKET from "ws";
+import WEB_SOCKET, { WebSocketServer } from "ws";
 import PROCESS from "node:process";
 
 /********************* Import the required files and functions *********************/
@@ -9,11 +9,11 @@ import {
     CLOSE,
     ERROR,
 } from "./Utilities/Constants.js";
-import { LOG_INFO } from "./Utilities/WinstonLogger.js";
+import { LOG_ERROR, LOG_INFO } from "./Utilities/WinstonLogger.js";
 
 /********************* Import the required files and functions *********************/
 const START_WEB_SOCKET_SERVER = (Server) => {
-    const WEB_SOCKET_SERVER = new WEB_SOCKET.Server({ server: Server }, () => {
+    const WEB_SOCKET_SERVER = new WebSocketServer({ server: Server }, () => {
         LOG_INFO({
             label: "Connection",
             service: "WebSocket",
@@ -29,6 +29,10 @@ const START_WEB_SOCKET_SERVER = (Server) => {
         // The remote IP address can be obtained from the raw socket.
         const IP = Request.socket.remoteAddress;
         LOG_INFO({ message: `IP: ${IP}` });
+
+        Socket.on(MESSAGE, (data) => {
+            LOG_INFO({ message: `WebSocket Message: ${data}` });
+        });
 
         Socket.on(ERROR, (error) => {
             LOG_ERROR({ message: `WebSocket Error: ${error.message}` });
