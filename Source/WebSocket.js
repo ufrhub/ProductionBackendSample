@@ -15,8 +15,8 @@ import { LOG_ERROR, LOG_INFO } from "./Utilities/WinstonLogger.js";
 const START_WEB_SOCKET_SERVER = (Server) => {
     const WEB_SOCKET_SERVER = new WebSocketServer({ server: Server }, () => {
         LOG_INFO({
-            label: "Connection",
-            service: "WebSocket",
+            label: "WebSocket.js",
+            service: "WebSocketServer",
             message: `WebSocket is ready...!, Worker ${PROCESS.pid} is listening WebSocket...!`,
         });
     });
@@ -28,27 +28,51 @@ const START_WEB_SOCKET_SERVER = (Server) => {
 
         // The remote IP address can be obtained from the raw socket.
         const IP = Request.socket.remoteAddress;
-        LOG_INFO({ message: `IP: ${IP}` });
+        LOG_INFO({
+            label: "WebSocket.js",
+            service: "Remote Address",
+            message: `IP: ${IP}`
+        });
 
         Socket.on(MESSAGE, (data) => {
-            LOG_INFO({ message: `WebSocket Message: ${data}` });
+            LOG_INFO({
+                label: "WebSocket.js",
+                service: "Socket Message",
+                message: `WebSocket Message: ${data}`
+            });
         });
 
         Socket.on(ERROR, (error) => {
-            LOG_ERROR({ message: `WebSocket Error: ${error.message}` });
+            LOG_ERROR({
+                label: "WebSocket.js",
+                service: "Socket Error",
+                message: `WebSocket Error: ${error.message}`
+            });
         });
 
         Socket.on(CLOSE, (code, reason) => {
-            LOG_INFO({ message: `WebSocket Closed: Code ${code}, Reason ${reason}` });
+            LOG_INFO({
+                label: "WebSocket.js",
+                service: "Socket Close",
+                message: `WebSocket Closed: Code ${code}, Reason ${reason}`
+            });
         });
     });
 
     WEB_SOCKET_SERVER.on(ERROR, (error) => {
-        LOG_ERROR({ message: `WebSocket Server Error: ${error.message}` });
+        LOG_ERROR({
+            label: "WebSocket.js",
+            service: "WebSocket Server Error",
+            message: `WebSocket Server Error: ${error.message}`
+        });
     });
 
     WEB_SOCKET_SERVER.on(CLOSE, () => {
-        LOG_INFO({ message: 'WebSocket Server Closed' });
+        LOG_INFO({
+            label: "WebSocket.js",
+            service: "WebSocket Server Close",
+            message: 'WebSocket Server Closed'
+        });
     });
 }
 
