@@ -7,14 +7,16 @@ const { combine, timestamp, label, json, colorize, simple } = WINSTON.format;
 
 /********************* Creates and configures a Winston logger instance *********************/
 const LOGGER = (Label = "", Service = "") => {
+    const formats = [timestamp(), json()];
+
+    if (Label) {
+        formats.unshift(label({ label: Label })); // Add label format if provided
+    }
+
     return WINSTON.createLogger({
         level: 'debug', // Set the default log level to 'debug'
-        format: combine(
-            label({ label: Label }), // Add a label to each log
-            timestamp(), // Add a timestamp to each log
-            json(), // Format logs as JSON
-        ),
-        defaultMeta: { service: Service }, // Add default metadata
+        format: combine(...formats),
+        defaultMeta: Service ? { service: Service } : {}, // Add default metadata
         exitOnError: false, // Prevent the process from exiting on an error
         silent: false, // Ensure logs are not suppressed
         transports: [
