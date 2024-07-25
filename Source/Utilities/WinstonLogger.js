@@ -6,7 +6,7 @@ import 'winston-daily-rotate-file';
 const { combine, timestamp, label, json, colorize, simple } = WINSTON.format;
 
 /********************* Creates and configures a Winston logger instance *********************/
-const LOGGER = (Label = "Winset Logger", Service = "user-service") => {
+const LOGGER = (Label = "", Service = "") => {
     return WINSTON.createLogger({
         level: 'debug', // Set the default log level to 'debug'
         format: combine(
@@ -73,7 +73,7 @@ const LOGGER = (Label = "Winset Logger", Service = "user-service") => {
 };
 
 /********************* Function to log an error message *********************/
-const LOG_ERROR = ({ label = "Winset Logger", service = "user-service", error = "" }) => {
+const LOG_ERROR = ({ label = "", service = "", error = "" }) => {
     /* Create a logger instance with the specified label and service */
     const logger = LOGGER(label, service);
     /* Log the message at the 'debug' level */
@@ -81,7 +81,7 @@ const LOG_ERROR = ({ label = "Winset Logger", service = "user-service", error = 
 }
 
 /********************* Function to log a warning message *********************/
-const LOG_WARN = ({ label = "Winset Logger", service = "user-service", message = "" }) => {
+const LOG_WARN = ({ label = "", service = "", message = "" }) => {
     /* Create a logger instance with the specified label and service */
     const logger = LOGGER(label, service);
     /* Log the message at the 'debug' level */
@@ -89,7 +89,7 @@ const LOG_WARN = ({ label = "Winset Logger", service = "user-service", message =
 }
 
 /********************* Function to log an info message *********************/
-const LOG_INFO = ({ label = "Winset Logger", service = "user-service", message = "" }) => {
+const LOG_INFO = ({ label = "", service = "", message = "" }) => {
     /* Create a logger instance with the specified label and service */
     const logger = LOGGER(label, service);
     /* Log the message at the 'debug' level */
@@ -97,7 +97,7 @@ const LOG_INFO = ({ label = "Winset Logger", service = "user-service", message =
 }
 
 /********************* Function to log a debug message *********************/
-const LOG_DEBUG = ({ label = "Winset Logger", service = "user-service", message = "" }) => {
+const LOG_DEBUG = ({ label = "", service = "", message = "" }) => {
     /* Create a logger instance with the specified label and service */
     const logger = LOGGER(label, service);
     /* Log the message at the 'debug' level */
