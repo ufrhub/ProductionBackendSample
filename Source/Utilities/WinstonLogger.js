@@ -3,7 +3,7 @@ import WINSTON from 'winston';
 import 'winston-daily-rotate-file';
 
 /********************* Destructure namespaces from Winston.format *********************/
-const { combine, timestamp, label, json, colorize, simple } = WINSTON.format;
+const { combine, timestamp, label, json, colorize, prettyPrint, ms, align } = WINSTON.format;
 
 /********************* Creates and configures a Winston logger instance *********************/
 const LOGGER = (Label = "", Service = "") => {
@@ -15,7 +15,11 @@ const LOGGER = (Label = "", Service = "") => {
 
     return WINSTON.createLogger({
         level: 'debug', // Set the default log level to 'debug'
-        format: combine(...formats),
+        format: combine(...formats,
+            colorize(), // Colorize console output
+            prettyPrint(), // Pretty-print JSON logs for readability
+            ms(), // Add milliseconds to timestamps
+        ),
         defaultMeta: Service ? { service: Service } : {}, // Add default metadata
         exitOnError: false, // Prevent the process from exiting on an error
         silent: false, // Ensure logs are not suppressed
@@ -61,7 +65,9 @@ const LOGGER = (Label = "", Service = "") => {
                 level: 'debug', // Console log level
                 format: combine(
                     colorize(), // Colorize the output
-                    simple(), // Simple format for console logs
+                    json(), // JSON format for console logs
+                    prettyPrint(), // Pretty-print JSON logs for readability
+                    align(), // Align console output
                 ),
             }),
         ],

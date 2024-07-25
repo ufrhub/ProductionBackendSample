@@ -22,6 +22,7 @@ import {
     SIGINT,
 } from "./Utilities/Constants.js";
 import { START_WEB_SOCKET_SERVER } from "./WebSocket.js";
+import { LOG_ERROR, LOG_WARN, LOG_INFO } from "./Utilities/WinstonLogger.js";
 
 /********************* Import The Routers *********************/
 import TestRouters from "./Routes/TestRouters.js";
@@ -96,7 +97,7 @@ APPLICATION.use("/api/v1", TestRouters);
 
 /********************* Error handling middleware *********************/
 APPLICATION.use((Error, Request, Response, Next) => {
-    console.error(Error.stack); // Log error details for internal use
+    LOG_ERROR({ label: "Application.js", service: "Middleware", error: Error.stack }); // Log error details for internal use
     Response.status(500).send('Something broke!'); // Generic message for users
 });
 
@@ -116,7 +117,7 @@ const START_SERVER = async () => {
     try {
         /* Handle Application-specific Errors */
         APPLICATION.on(ERROR, (error) => {
-            console.log("Application Error: ", error);
+            LOG_ERROR({ label: "Application.js", service: "Server", error: `Application Error: ${error.message}` });
             throw error;
         });
 
@@ -125,17 +126,29 @@ const START_SERVER = async () => {
 
         /* Start the http server and listen on the specified port. Log the server and worker information. */
         const Server = await HTTP_SERVER.listen((PORT), () => {
-            console.info({
-                worker: `Worker ${PROCESS.pid} started`,
-                server: `Server is running on PORT = ${PORT}`,
+            LOG_INFO({
+                label: "Application.js",
+                service: "HTTP_SERVER",
+                message: {
+                    worker: `Worker ${PROCESS.pid} started`,
+                    server: `Server is running on PORT = ${PORT}`,
+                }
             });
         });
 
         /* Define a function for graceful shutdown, which takes an exit code as a parameter. */
         const GracefullyShutdownServer = (exitCode) => {
-            console.info(`Worker ${PROCESS.pid} is shutting down...!`);
+            LOG_INFO({
+                label: "Application.js",
+                service: "GracefullyShutdownServer",
+                message: `Worker ${PROCESS.pid} is shutting down...!`
+            });
             Server.close(() => {
-                console.log(`Worker ${PROCESS.pid} has shut down...!`);
+                LOG_INFO({
+                    label: "Application.js",
+                    service: "Server.close",
+                    message: `Worker ${PROCESS.pid} has shut down...!`
+                });
                 PROCESS.exit(exitCode);
             });
         }
@@ -150,13 +163,21 @@ const START_SERVER = async () => {
 
         /* Handle unhandled promise rejections. */
         PROCESS.on(UNHANDLED_REJECTION, (reason, promise) => {
-            console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+            LOG_ERROR({
+                label: "Application.js",
+                service: "Unhandled Rejection",
+                error: `Unhandled Rejection at: ${promise}, reason: ${reason}`
+            });
             GracefullyShutdownServer(1); // Gracefully shut down with exit code 1.
         });
 
         /* Handle uncaught exceptions. */
         PROCESS.on(UNCAUGHT_EXCEPTION, (error) => {
-            console.error(`Uncaught Exception: ${error}`);
+            LOG_ERROR({
+                label: "Application.js",
+                service: "Uncaught Exception",
+                error: `Uncaught Exception: ${error}`
+            });
             GracefullyShutdownServer(1); // Gracefully shut down with exit code 1.
         });
 
@@ -170,7 +191,11 @@ const START_SERVER = async () => {
             GracefullyShutdownServer(0); // Gracefully shut down with exit code 0.
         });
     } catch (error) {
-        console.error(`Error starting server: ${error.message}`); // Log any error that occurs while starting the server.
+        LOG_ERROR({
+            label: "Application.js",
+            service: "starting server catch",
+            error: `Error starting server: ${error.message}`
+        }); // Log any error that occurs while starting the server.
         PROCESS.exit(1); // Exit the process with an error code.
     }
 }
