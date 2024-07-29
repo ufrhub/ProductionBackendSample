@@ -23,6 +23,7 @@ import {
     FORK,
 } from "./Utilities/Constants.js";
 import { START_SERVER } from "./Application.js";
+import { REDIS } from "./Redis.js";
 import { LOG_ERROR, LOG_WARN, LOG_INFO } from "./Utilities/WinstonLogger.js";
 
 /********************* Get the directory name of the current module *********************/
@@ -61,6 +62,16 @@ if (PROCESS.platform !== 'win32') {
             for (let i = 0; i < totalCPUs; i++) {
                 CLUSTER.fork();
             }
+
+            /* Check for the Redis Connection by setting and getting string value */
+            REDIS.set("myKey:test", "Redis is connected...!");
+            REDIS.get("myKey:test", (error, result) => {
+                if (error) {
+                    console.error(error);
+                } else {
+                    console.log(result); // Prints "Redis is connected...!"
+                }
+            });
         }).catch((error) => {
             LOG_ERROR({
                 label: "Server.js",
