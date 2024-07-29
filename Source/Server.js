@@ -41,7 +41,7 @@ const totalCPUs = OPERATING_SYSTEM.cpus().length;
 const ForkedWorkers = [];
 
 /********************* Set the Cluster scheduling policy *********************/
-if (PROCESS.platform === 'win32') {
+if (PROCESS.platform !== 'win32') {
     CLUSTER.schedulingPolicy = CLUSTER.SCHED_RR; // Set to Round-Robin
 } else {
     CLUSTER.schedulingPolicy = CLUSTER.SCHED_NONE; // Leave it to the Operating System

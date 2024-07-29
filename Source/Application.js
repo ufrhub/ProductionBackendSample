@@ -91,7 +91,13 @@ APPLICATION.use(Limiter);
 
 /********************* Declare the Routes *********************/
 APPLICATION.get('/health', (Request, Response) => {
-    Response.status(200).send('OK');
+    Response.status(200).json(
+        [
+            {
+                message: `Worker ${PROCESS.pid} is handling the task...!`, // Send a JSON response with a message
+            }
+        ]
+    );
 });
 APPLICATION.use("/api/v1", TestRouters);
 
