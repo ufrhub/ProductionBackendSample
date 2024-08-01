@@ -5,6 +5,7 @@ export const DATABASE_NAME = "YoutubeClone";
 export const ONLINE = "online";
 export const FORK = "fork";
 export const LISTENING = "listening";
+export const CONNECT = "connect";
 export const CONNECTION = "connection";
 export const CLOSE = "close";
 export const DISCONNECT = "disconnect";

@@ -9,6 +9,7 @@ import PROCESS from "node:process";
 /********************* Import the required files and functions *********************/
 import { CONNECT_DATABASE } from "./Database.js";
 import {
+    CONNECT,
     ONLINE,
     MESSAGE,
     SHUTDOWN,
@@ -57,29 +58,29 @@ if (PROCESS.platform !== 'win32') {
             message: `Primary Worker ${PROCESS.pid} is running...!`,
         }); // Log the Primary Worker process ID
 
-        /* Connect to MongoDB Database in the Primary Worker process */
-        CONNECT_DATABASE().then(() => {
-            for (let i = 0; i < totalCPUs; i++) {
-                CLUSTER.fork();
-            }
-
-            /* Check for the Redis Connection by setting and getting string value */
-            REDIS.set("myKey:test", "Redis is connected...!");
-            REDIS.get("myKey:test", (error, result) => {
-                if (error) {
-                    console.error(error);
-                } else {
-                    console.log(result); // Prints "Redis is connected...!"
-                }
-            });
-        }).catch((error) => {
-            LOG_ERROR({
+        /* Connect to Redis Database in the Primary Worker process */
+        REDIS.on(CONNECT, () => {
+            LOG_INFO({
                 label: "Server.js",
-                service: "Connection",
-                error: {
-                    error: error.message,
-                    message: `An error occured while connection to the Database`,
-                },
+                service: "Redis Connection",
+                message: `Redis is connected to the cloud...!`,
+            });
+
+            /* Connect to MongoDB Database in the Primary Worker process */
+            CONNECT_DATABASE().then(() => {
+                /* Create multiple worker processes, one for each available CPU core */
+                for (let i = 0; i < totalCPUs; i++) {
+                    CLUSTER.fork();
+                }
+            }).catch((error) => {
+                LOG_ERROR({
+                    label: "Server.js",
+                    service: "Connection",
+                    error: {
+                        error: error.message,
+                        message: `An error occured while connection to the Database`,
+                    },
+                });
             });
         });
 
