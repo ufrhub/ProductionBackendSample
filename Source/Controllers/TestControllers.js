@@ -1,38 +1,57 @@
-export const TestGetRequest = (Request, Response) => {
-    for (let i = 0; i < 10000000000; i++) {
+import { REDIS } from "../Redis.js";
 
-    }
-    Response.json(
-        [
+export const TestGetRequest = async (Request, Response) => {
+    const Currencies = await REDIS.get("TestGetRequest:currencies");
+
+    if (Currencies) {
+        return Response.json(
             {
-                message: `Worker ${process.pid} is handling the task...!`, // Send a JSON response with a message
+                message: `Worker ${process.pid} is handling the task...! message from redis`, // Send a JSON response with a message
+                data: JSON.parse(Currencies)
             }
-        ]
-    );
+        );
+    }
+
+    fetch('https://freetestapi.com/api/v1/currencies')
+        .then(response => response.json())
+        .then(async (json) => {
+            await REDIS.setex("TestGetRequest:currencies", 20, JSON.stringify(json));
+
+            return Response.json(
+                {
+                    message: `Worker ${process.pid} is handling the task...!`, // Send a JSON response with a message
+                    data: json
+                }
+            );
+        });
 }
 
-export const TestGetRequest2 = (Request, Response) => {
-    for (let i = 0; i < 30000000000; i++) {
+export const TestPostRequest = async (Request, Response) => {
+    const { data } = Request.body;
 
-    }
-    Response.json(
-        [
+    const Data = await REDIS.get("TestPostRequest:todos");
+
+    if (Data) {
+        return Response.json(
             {
-                message: `Worker ${process.pid} is handling the task 2...!`, // Send a JSON response with a message
+                message: `Worker ${process.pid} is handling the task...! message from redis`, // Send a JSON response with a message
+                requestedData: data,
+                data: JSON.parse(Data)
             }
-        ]
-    );
-}
-
-export const TestGetRequest3 = (Request, Response) => {
-    for (let i = 0; i < 50000000000; i++) {
-
+        );
     }
-    Response.json(
-        [
-            {
-                message: `Worker ${process.pid} is handling the task 3...!`, // Send a JSON response with a message
-            }
-        ]
-    );
+
+    fetch('https://jsonplaceholder.typicode.com/todos')
+        .then(response => response.json())
+        .then(async (json) => {
+            await REDIS.setex("TestPostRequest:todos", 20, JSON.stringify(json));
+
+            return Response.json(
+                {
+                    message: `Worker ${process.pid} is handling the task...!`, // Send a JSON response with a message
+                    requestedData: data,
+                    data: json
+                }
+            );
+        });
 }
