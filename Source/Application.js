@@ -83,11 +83,11 @@ const Limiter = RATE_LIMIT({
     message: "Too many requests, Please try again later.", // Message to send when rate limit is exceeded
 });
 
-/********************* Use Morgan middleware for logging in 'combined' format *********************/
-APPLICATION.use(MORGAN('combined')); // Use 'combined' for more detailed logs
-
 /********************* Use rate limit middleware *********************/
 APPLICATION.use(Limiter);
+
+/********************* Use Morgan middleware for logging in 'combined' format *********************/
+APPLICATION.use(MORGAN('combined')); // Use 'combined' for more detailed logs
 
 /********************* Declare the Routes *********************/
 APPLICATION.get('/health', (Request, Response) => {
