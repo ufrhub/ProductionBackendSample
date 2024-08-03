@@ -5,14 +5,14 @@
 class ApiError extends Error {
     /*******
      * Constructor for the ApiError class.
-     * @param {number} statusCode - The HTTP status code associated with the error.
-     * @param {string} [message="Something went wrong"] - A descriptive error message. Defaults to "Something went wrong".
-     * @param {Array} [errors=[]] - An optional array of additional error details. Defaults to an empty array.
-     * @param {string} [stack=""] - An optional stack trace. If not provided, a stack trace will be generated.
+     * - @param {number} statusCode - The HTTP status code associated with the error.
+     * - @param {string} [message="Something went wrong"] - A descriptive error message. Defaults to "Something went wrong".
+     * - @param {Array} [errors=[]] - An optional array of additional error details. Defaults to an empty array.
+     * - @param {string} [stack=""] - An optional stack trace. If not provided, a stack trace will be generated.
      *******/
     constructor(
         statusCode,
-        message = "Something went wrong",
+        message = "Something went wrong...!",
         errors = [],
         stack = ""
     ) {
