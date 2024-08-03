@@ -1,17 +1,50 @@
+/*********************
+ * Import custom modules and functions.
+ * - LOG_ERROR: Logging functions for error logs.
+ *********************/
+import { LOG_ERROR } from "./WinstonLogger.js";
+
 /********************* 
  * AsynchronousHandler is a higher-order function that takes a RequestHandler
  * function as an argument and returns a new function. This returned function
- * wraps the RequestHandler in a Promise to handle asynchronous errors.
+ * wraps the RequestHandler in a Promise to handle both synchronous and asynchronous errors.
  *********************/
 const AsynchronousHandler = (RequestHandler) => (Request, Response, Next) => {
-    /*******
-     * The RequestHandler is called with the Request, Response, and Next
-     * arguments. If the handler returns a promise, Promise.resolve() will
-     * ensure that it's handled. If an error occurs, it will be caught and
-     * passed to the Next() function, which is an Express middleware function
-     * for handling errors.
-     *******/
-    Promise.resolve(RequestHandler(Request, Response, Next)).catch((error) => Next(error));
+    try {
+        /*******
+         * The RequestHandler is called with the Request, Response, and Next
+         * arguments. If the handler returns a promise, Promise.resolve() will
+         * ensure that it's handled. If an error occurs during the execution of
+         * the handler, it will be caught and passed to the Next() function,
+         * which is an Express middleware function for handling errors.
+         *******/
+        Promise.resolve(RequestHandler(Request, Response, Next))
+            .catch((error) => {
+                // Log the error
+                LOG_ERROR({
+                    label: "AsynchronousHandler.js",
+                    service: "catch",
+                    error: `Error in RequestHandler: ${error}`
+                });
+
+                /*******
+                 * Pass the error to the next middleware function for handling.
+                 *******/
+                Next(error);
+            });
+    } catch (error) {
+        // If a synchronous error occurs, log the error
+        LOG_ERROR({
+            label: "AsynchronousHandler.js",
+            service: "catch",
+            error: `Synchronous error in RequestHandler: ${error}`
+        });
+
+        /*******
+         * Pass the error to the next middleware function for handling.
+         *******/
+        Next(error);
+    }
 }
 
 /********************* 
