@@ -5,7 +5,7 @@ import EXPRESS from "express";
 const ROUTER = EXPRESS.Router();
 
 /********************* Import The Controllers *********************/
-import { TestGetRequest, TestPostRequest } from "../Controllers/TestControllers.js";
+import { TestGetRequest, TestPostRequest } from "../Controllers/Test.Controllers.js";
 
 /********************* Declare The Routes And Bind With The Controller Methods *********************/
 ROUTER.get("/testGetRequest", TestGetRequest);

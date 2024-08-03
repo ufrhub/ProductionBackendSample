@@ -43,9 +43,9 @@ import { LOG_ERROR, LOG_WARN, LOG_INFO } from "./Utilities/WinstonLogger.js";
 
 /*********************
  * Import router modules for handling specific routes.
- * - TestRouters: Router module for handling test-related routes.
+ * - Test.Routes: Router module for handling test-related routes.
  *********************/
-import TestRouters from "./Routes/TestRouters.js";
+import TestRouters from "./Routes/Test.Routes.js";
 
 /*********************
  * Determine the directory name (__dirname) of the current module.
