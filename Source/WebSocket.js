@@ -1,9 +1,18 @@
-/********************* Import the required Packages *********************/
+/*********************
+ * Import necessary packages and modules.
+ * - WebSocketServer: A class from the "ws" package used to create a WebSocket server.
+ * - process: Provides information and control over the current Node.js process.
+ * - jsonwebtoken: A package to work with JSON Web Tokens (JWTs) for authorization.
+ *********************/
 import { WebSocketServer } from "ws";
 import PROCESS from "node:process";
 import JSON_WEB_TOKEN from "jsonwebtoken"
 
-/********************* Import the required files and functions *********************/
+/*********************
+ * Import custom modules and functions.
+ * - Constants: Various constant values used throughout the code, such as event types and error messages.
+ * - WinstonLogger: Custom logging functions for different log levels (error, info).
+ *********************/
 import {
     CONNECTION,
     UNAUTHORIZED,
@@ -22,7 +31,7 @@ import { LOG_ERROR, LOG_INFO } from "./Utilities/WinstonLogger.js";
 const START_WEB_SOCKET_SERVER = (Server) => {
     /******* Create a new WebSocket Server instance and attach it to the provided Express server. *******/
     const WEB_SOCKET_SERVER = new WebSocketServer({ server: Server }, () => {
-        /* Log an informational message indicating that the WebSocket Server is ready. */
+        // Log an informational message indicating that the WebSocket Server is ready.
         LOG_INFO({
             label: "WebSocket.js",
             service: "WebSocketServer",
@@ -49,7 +58,7 @@ const START_WEB_SOCKET_SERVER = (Server) => {
                 /* Set the Authenticated Client data on the Socket. */
                 Socket.Client = Client;
 
-                /* Log information about the Authenticated Client. */
+                // Log information about the Authenticated Client.
                 LOG_INFO({
                     label: "WebSocket.js",
                     service: "Client Authentication",
@@ -76,7 +85,7 @@ const START_WEB_SOCKET_SERVER = (Server) => {
             /******* The remote IP address can be obtained from the raw Socket. *******/
             const IP = Request.socket.remoteAddress;
 
-            /* Log the Client's IP address along with the Client Information. */
+            // Log the Client's IP address along with the Client Information.
             LOG_INFO({
                 label: "WebSocket.js",
                 service: "Remote Address",
@@ -88,7 +97,7 @@ const START_WEB_SOCKET_SERVER = (Server) => {
 
             /******* Event listener for messages received from the Client. *******/
             Socket.on(MESSAGE, (data) => {
-                /* Log the received message data. */
+                // Log the received message data.
                 LOG_INFO({
                     label: "WebSocket.js",
                     service: "Socket Message",
@@ -98,17 +107,17 @@ const START_WEB_SOCKET_SERVER = (Server) => {
 
             /******* Event listener for pings received from the Client. *******/
             Socket.on(PING, () => {
-                /* Log the ping event. */
+                // Log the ping event.
                 LOG_INFO({
                     label: "WebSocket.js",
                     service: "Ping",
                     message: `Received ping from client ${Client.id}`
                 });
             });
-            
+
             /******* Event listener for pongs received from the Client. *******/
             Socket.on(PONG, () => {
-                /* Log the pong event. */
+                // Log the pong event.
                 LOG_INFO({
                     label: "WebSocket.js",
                     service: "Pong",
@@ -119,7 +128,7 @@ const START_WEB_SOCKET_SERVER = (Server) => {
 
         /******* Event listener for errors occurring on the Socket. *******/
         Socket.on(ERROR, (error) => {
-            /* Log the error message. */
+            // Log the error message.
             LOG_ERROR({
                 label: "WebSocket.js",
                 service: "Socket Error",
@@ -129,7 +138,7 @@ const START_WEB_SOCKET_SERVER = (Server) => {
 
         /******* Event listener for when the Socket Connection is Closed. *******/
         Socket.on(CLOSE, (code, reason) => {
-            /* Log the code and reason for the Connection Closure. */
+            // Log the code and reason for the Connection Closure.
             LOG_INFO({
                 label: "WebSocket.js",
                 service: "Socket Close",
@@ -140,7 +149,7 @@ const START_WEB_SOCKET_SERVER = (Server) => {
 
     /******* Event listener for errors occurring on the WebSocket Server. *******/
     WEB_SOCKET_SERVER.on(ERROR, (error) => {
-        /* Log the Server error message. */
+        // Log the Server error message.
         LOG_ERROR({
             label: "WebSocket.js",
             service: "WebSocket Server Error",
@@ -150,7 +159,7 @@ const START_WEB_SOCKET_SERVER = (Server) => {
 
     /******* Event listener for when the WebSocket Server is Closed. *******/
     WEB_SOCKET_SERVER.on(CLOSE, () => {
-        /* Log that the WebSocket Server has been Closed. */
+        // Log that the WebSocket Server has been Closed.
         LOG_INFO({
             label: "WebSocket.js",
             service: "WebSocket Server Close",
@@ -159,5 +168,8 @@ const START_WEB_SOCKET_SERVER = (Server) => {
     });
 }
 
-/********************* Export the function to Start the WebSocket Server. *********************/
+/*********************
+ * Export the START_WEB_SOCKET_SERVER function for use in other modules.
+ * This function initializes and starts the WebSocket server, attaching it to an existing HTTP server.
+ *********************/
 export { START_WEB_SOCKET_SERVER };
