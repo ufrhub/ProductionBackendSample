@@ -50,6 +50,8 @@ import TestRouters from "./Routes/TestRouters.js";
 /*********************
  * Determine the directory name (__dirname) of the current module.
  * This is necessary because __dirname is not available when using ES modules.
+ * - __filename: The file URL of the current module.
+ * - __dirname: The directory name of the current module.
  *********************/
 const __filename = URL.fileURLToPath(import.meta.url);
 const __dirname = PATH.dirname(__filename);
