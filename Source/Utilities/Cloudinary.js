@@ -41,3 +41,5 @@ const UPLOAD_FILE_ON_CLOUDINARY = async (LocalFilePath) => {
         return null;
     }
 }
+
+export { UPLOAD_FILE_ON_CLOUDINARY };
