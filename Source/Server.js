@@ -8,7 +8,7 @@
  *********************/
 import DOTENV from "dotenv";
 import PATH from "node:path";
-import URL from 'node:url';
+import URL from "node:url";
 import CLUSTER from "node:cluster";
 import OPERATING_SYSTEM from "node:os";
 import PROCESS from "node:process";
