@@ -2,9 +2,9 @@
  * Custom error class to handle API-related errors.
  * Extends the built-in Error class to include additional properties specific to API errors.
  *********************/
-class ApiError extends Error {
+class API_ERROR extends Error {
     /*******
-     * Constructor for the ApiError class.
+     * Constructor for the API_ERROR class.
      * - @param {number} statusCode - The HTTP status code associated with the error.
      * - @param {string} [message="Something went wrong"] - A descriptive error message. Defaults to "Something went wrong".
      * - @param {Array} [errors=[]] - An optional array of additional error details. Defaults to an empty array.
@@ -59,6 +59,6 @@ class ApiError extends Error {
 }
 
 /*********************
- * Export the ApiError class for use in other parts of the application.
+ * Export the API_ERROR class for use in other parts of the application.
  *********************/
-export { ApiError };
+export { API_ERROR };

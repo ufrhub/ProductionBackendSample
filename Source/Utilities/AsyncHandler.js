@@ -9,41 +9,50 @@ import { LOG_ERROR } from "./WinstonLogger.js";
  * function as an argument and returns a new function. This returned function
  * wraps the RequestHandler in a Promise to handle both synchronous and asynchronous errors.
  *********************/
-const AsynchronousHandler = (RequestHandler) => (Request, Response, Next) => {
-    try {
-        /*******
-         * The RequestHandler is called with the Request, Response, and Next
-         * arguments. If the handler returns a promise, Promise.resolve() will
-         * ensure that it's handled. If an error occurs during the execution of
-         * the handler, it will be caught and passed to the Next() function,
-         * which is an Express middleware function for handling errors.
-         *******/
-        Promise.resolve(RequestHandler(Request, Response, Next))
-            .catch((error) => {
-                // Log the error
-                LOG_ERROR({
-                    label: "AsynchronousHandler.js",
-                    service: "catch",
-                    error: `Error in RequestHandler: ${error}`
+const ASYNCHRONOUS_HANDLER = (RequestHandler) => {
+    /*******
+     * The middleware function is returned here, which takes in three parameters:
+     * - Request: The incoming HTTP request object from the client.
+     * - Response: The HTTP response object used to send a response back to the client.
+     * - Next: A callback function that passes control to the next middleware in the Express stack.
+     * This returned function wraps the original RequestHandler function and includes error-handling logic.
+     *******/
+    return (Request, Response, Next) => {
+        try {
+            /*******
+             * The RequestHandler is called with the Request, Response, and Next
+             * arguments. If the handler returns a promise, Promise.resolve() will
+             * ensure that it's handled. If an error occurs during the execution of
+             * the handler, it will be caught and passed to the Next() function,
+             * which is an Express middleware function for handling errors.
+             *******/
+            Promise.resolve(RequestHandler(Request, Response, Next))
+                .catch((error) => {
+                    // Log the error
+                    LOG_ERROR({
+                        label: "AsynchronousHandler.js",
+                        service: "catch",
+                        error: `Error in RequestHandler: ${error}`
+                    });
+
+                    /*******
+                     * Pass the error to the next middleware function for handling.
+                     *******/
+                    Next(error);
                 });
-
-                /*******
-                 * Pass the error to the next middleware function for handling.
-                 *******/
-                Next(error);
+        } catch (error) {
+            // If a synchronous error occurs, log the error
+            LOG_ERROR({
+                label: "AsynchronousHandler.js",
+                service: "catch",
+                error: `Synchronous error in RequestHandler: ${error}`
             });
-    } catch (error) {
-        // If a synchronous error occurs, log the error
-        LOG_ERROR({
-            label: "AsynchronousHandler.js",
-            service: "catch",
-            error: `Synchronous error in RequestHandler: ${error}`
-        });
 
-        /*******
-         * Pass the error to the next middleware function for handling.
-         *******/
-        Next(error);
+            /*******
+             * Pass the error to the next middleware function for handling.
+             *******/
+            Next(error);
+        }
     }
 }
 
@@ -52,7 +61,7 @@ const AsynchronousHandler = (RequestHandler) => (Request, Response, Next) => {
  * operations, but it uses the try-catch syntax. It takes a RequestHandler function
  * and returns an async function.
  *********************/
-const AsyncHandlerTryCatch = (RequestHandler) => async (Request, Response, Next) => {
+const ASYNCHRONOUS_HANDLER_TryCatch = (RequestHandler) => async (Request, Response, Next) => {
     try {
         /*******
          * The RequestHandler is awaited here, meaning it can handle asynchronous
@@ -80,4 +89,4 @@ const AsyncHandlerTryCatch = (RequestHandler) => async (Request, Response, Next)
  * applications to wrap route handlers, ensuring that any errors in asynchronous
  * operations are properly caught and handled.
  *********************/
-export { AsynchronousHandler, AsyncHandlerTryCatch };
+export { ASYNCHRONOUS_HANDLER, ASYNCHRONOUS_HANDLER_TryCatch };

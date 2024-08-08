@@ -42,12 +42,6 @@ import { START_WEB_SOCKET_SERVER } from "./WebSocket.js";
 import { LOG_ERROR, LOG_WARN, LOG_INFO } from "./Utilities/WinstonLogger.js";
 
 /*********************
- * Import router modules for handling specific routes.
- * - Test.Routes: Router module for handling test-related routes.
- *********************/
-import TestRouters from "./Routes/Test.Routes.js";
-
-/*********************
  * Determine the directory name (__dirname) of the current module.
  * This is necessary because __dirname is not available when using ES modules.
  * - __filename: The file URL of the current module.
@@ -157,6 +151,14 @@ APPLICATION.use(Limiter);
 APPLICATION.use(MORGAN('combined'));
 
 /*********************
+ * Import router modules for handling specific routes.
+ * - Test.Routes: Router module for handling test-related routes.
+ * - User.Routes: Router module for handling user-related routes.
+ *********************/
+import TestRouters from "./Routes/Test.Routes.js";
+import USER_ROUTERS from "./Routes/User.Routes.js";
+
+/*********************
  * Define the routes for the application.
  * - /health: A simple health check endpoint that responds with the worker's process ID.
  * - /api/v1: A route prefix for version 1 of the API, handled by the TestRouters module.
@@ -171,6 +173,7 @@ APPLICATION.get('/health', (Request, Response) => {
     );
 });
 APPLICATION.use("/api/v1", TestRouters);
+APPLICATION.use("/api/v1/user/", USER_ROUTERS);
 
 /*********************
  * Error handling middleware to catch and respond to errors.

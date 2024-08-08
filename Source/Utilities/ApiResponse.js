@@ -2,9 +2,9 @@
  * Class to structure API responses consistently.
  * This class is used to format the response sent to the client, ensuring a standard format for success and error messages.
  *********************/
-class ApiResponse {
+class API_RESPONSE {
     /*******
-     * Constructor for the ApiResponse class.
+     * Constructor for the API_RESPONSE class.
      * - @param {number} statusCode - The HTTP status code for the response (e.g., 200, 404).
      * - @param {Object} data - The data to be included in the response. This can be any data object that the API returns.
      * - @param {string} [message="Success...!"] - A message to include with the response. Defaults to "Success...!".
@@ -33,6 +33,6 @@ class ApiResponse {
 }
 
 /*********************
- * Export the ApiResponse class for use in other parts of the application.
+ * Export the API_RESPONSE class for use in other parts of the application.
  *********************/
-export { ApiResponse };
+export { API_RESPONSE };
