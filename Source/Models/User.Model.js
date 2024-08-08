@@ -81,7 +81,7 @@ UserSchema.methods.GenerateAccessToken = async function () {
     );
 }
 
-UserSchema.methods.GenerateRefreshToken = async function (payload) {
+UserSchema.methods.GenerateRefreshToken = async function () {
     return await JSON_WEB_TOKEN.sign(
         {
             _id: this._id,
