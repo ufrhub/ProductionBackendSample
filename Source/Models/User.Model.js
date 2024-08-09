@@ -8,7 +8,7 @@
  *********************/
 import MONGOOSE, { Schema } from "mongoose";
 import PROCESS from "node:process";
-import BCRYPT from "bcrypt";
+import BCRYPT from "bcryptjs";
 import JSON_WEB_TOKEN from "jsonwebtoken";
 
 /*********************

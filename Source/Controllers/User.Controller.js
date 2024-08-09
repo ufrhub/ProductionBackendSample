@@ -31,8 +31,12 @@ export const REGISTER_NEW_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) 
     }
 
     const ExistingUser = await USER.findOne({
-        $or: [{ username: username }, { email: email }]
+        $or: [{ username }, { email }]
     });
+
+    return Response.status(201).json(
+        new API_RESPONSE(200, username, "User registered successfully...!")
+    );
 
     if (ExistingUser) throw new API_ERROR(400, "User already exist...!"); // Bad Request
 

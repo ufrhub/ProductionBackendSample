@@ -28,6 +28,8 @@ import MORGAN from "morgan";
  * - Constants: Various constant values used throughout the code.
  * - START_WEB_SOCKET_SERVER: Function to start a WebSocket server.
  * - LOG_ERROR, LOG_WARN, LOG_INFO: Logging functions for different log levels.
+ * - API_ERROR: Response error messages.
+ * - API_RESPONSE: Response success messages.
  *********************/
 import {
     ERROR,
@@ -40,6 +42,8 @@ import {
 } from "./Utilities/Constants.js";
 import { START_WEB_SOCKET_SERVER } from "./WebSocket.js";
 import { LOG_ERROR, LOG_WARN, LOG_INFO } from "./Utilities/WinstonLogger.js";
+import { API_ERROR } from "./Utilities/ApiError.js";
+import { API_RESPONSE } from "./Utilities/ApiResponse.js";
 
 /*********************
  * Determine the directory name (__dirname) of the current module.
@@ -162,18 +166,22 @@ import USER_ROUTERS from "./Routes/User.Routes.js";
  * Define the routes for the application.
  * - /health: A simple health check endpoint that responds with the worker's process ID.
  * - /api/v1: A route prefix for version 1 of the API, handled by the TestRouters module.
+ * - /api/v1/user: A route prefix for version 1 of the API, handled by the USER_ROUTERS module.
  *********************/
 APPLICATION.get('/health', (Request, Response) => {
-    Response.status(200).json(
-        [
-            {
-                message: `Worker ${PROCESS.pid} is handling the task...!`, // Send a JSON response with a message
-            }
-        ]
+    return Response.status(201).json(
+        new API_RESPONSE(
+            200,
+            [
+                {
+                    message: `Worker ${PROCESS.pid} is handling the task...!`, // Send a JSON response with a message
+                }
+            ],
+            "User registered successfully...!")
     );
 });
 APPLICATION.use("/api/v1", TestRouters);
-APPLICATION.use("/api/v1/user/", USER_ROUTERS);
+APPLICATION.use("/api/v1/user", USER_ROUTERS);
 
 /*********************
  * Error handling middleware to catch and respond to errors.
@@ -181,7 +189,7 @@ APPLICATION.use("/api/v1/user/", USER_ROUTERS);
  *********************/
 APPLICATION.use((Error, Request, Response, Next) => {
     LOG_ERROR({ label: "Application.js", service: "Middleware", error: Error.stack }); // Log error details for internal use
-    Response.status(500).send('Something broke!'); // Generic message for users
+    throw new API_ERROR(500, "Something broke...!"); // Generic message for users
 });
 
 /*********************
@@ -189,7 +197,7 @@ APPLICATION.use((Error, Request, Response, Next) => {
  * Sends a 404 status and message when a requested route is not found.
  *********************/
 APPLICATION.use((Request, Response, Next) => {
-    Response.status(404).send('Route not found'); // Send a 404 status and message
+    throw new API_ERROR(404, "Route not found...!"); // Send a 404 status and message
 });
 
 /*********************
