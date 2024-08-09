@@ -50,6 +50,7 @@ const UPLOAD_FILE_ON_CLOUDINARY = async (LocalFilePath) => {
             message: Response,
         });
 
+        FILE_SYSTEM.unlinkSync(LocalFilePath);
         return Response;
     } catch (error) {
         FILE_SYSTEM.unlinkSync(LocalFilePath);
