@@ -21,4 +21,7 @@ export const UNCAUGHT_EXCEPTION = "uncaughtException";
 export const DATABASE_CONNECTED = "DatabaseConnected";
 export const SIGTERM = "SIGTERM";
 export const SIGINT = "SIGINT";
+
+/* Mongoose Constants */
+export const SAVE = "save";
     

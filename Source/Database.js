@@ -15,10 +15,10 @@ import PROCESS from "node:process";
 /*********************
  * Import custom modules and functions.
  * - Constants: Various constant values used throughout the code.
- * - LOG_ERROR, LOG_WARN, LOG_INFO: Logging functions for different log levels.
+ * - LOG_ERROR, LOG_INFO: Logging functions for different log levels.
  *********************/
 import { DATABASE_NAME } from "./Utilities/Constants.js";
-import { LOG_ERROR, LOG_WARN, LOG_INFO } from "./Utilities/WinstonLogger.js";
+import { LOG_ERROR, LOG_INFO } from "./Utilities/WinstonLogger.js";
 
 /*********************
  * Determine the directory name (__dirname) of the current module.
@@ -73,13 +73,19 @@ const CONNECT_DATABASE = async () => {
     }
 
     try {
-        const ConnectionInstance = await MONGOOSE.connect(`${MongoDB_URI}/${DATABASE_NAME}`);
+        const ConnectionInstance = await MONGOOSE.connect(`${MongoDB_URI}/${DATABASE_NAME}`, {
+            serverSelectionTimeoutMS: 10000, // Timeout after 10s instead of 30s
+            socketTimeoutMS: 60000, // Close sockets after 60 seconds of inactivity
+        });
         isConnected = true;
 
         LOG_INFO({
             label: "Database.js",
             service: "Mongoose Connect",
-            message: `MongoDB Database Connected...! \nDATABASE HOST = ${ConnectionInstance.connection.host}`
+            message: {
+                MESSAGE: `MongoDB Database Connected...!`,
+                DATABASE_HOST: ConnectionInstance.connection.host,
+            }
         });
     } catch (error) {
         LOG_ERROR({

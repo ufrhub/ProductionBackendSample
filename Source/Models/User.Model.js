@@ -12,6 +12,13 @@ import BCRYPT from "bcryptjs";
 import JSON_WEB_TOKEN from "jsonwebtoken";
 
 /*********************
+ * Import custom modules and functions.
+ * - Constants: Various constant values used throughout the code.
+ * - LOG_ERROR, LOG_WARN, LOG_INFO: Logging functions for different log levels.
+ *********************/
+import { SAVE } from "../Utilities/Constants.js";
+
+/*********************
  * Define the User Schema
  * - USER_SCHEMA: Mongoose schema to define the structure of User documents in MongoDB.
  * - username: Unique identifier for the user, stored in lowercase.
@@ -81,7 +88,7 @@ const USER_SCHEMA = new Schema(
  * - If the password field is modified, it hashes the password before saving it to the database.
  * - The number of salt rounds for hashing is set to 12.
  *********************/
-USER_SCHEMA.pre("save", async function (Next) {
+USER_SCHEMA.pre(SAVE, async function (Next) {
     if (!this.isModified("password")) return Next();
 
     const SaltRounds = 12;
