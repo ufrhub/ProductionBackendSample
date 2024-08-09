@@ -27,7 +27,7 @@ import MORGAN from "morgan";
  * Import custom modules and functions.
  * - Constants: Various constant values used throughout the code.
  * - START_WEB_SOCKET_SERVER: Function to start a WebSocket server.
- * - LOG_ERROR, LOG_WARN, LOG_INFO: Logging functions for different log levels.
+ * - LOG_ERROR, LOG_INFO: Logging functions for different log levels.
  * - API_ERROR: Response error messages.
  * - API_RESPONSE: Response success messages.
  *********************/
@@ -41,7 +41,7 @@ import {
     SIGINT,
 } from "./Utilities/Constants.js";
 import { START_WEB_SOCKET_SERVER } from "./WebSocket.js";
-import { LOG_ERROR, LOG_WARN, LOG_INFO } from "./Utilities/WinstonLogger.js";
+import { LOG_ERROR, LOG_INFO } from "./Utilities/WinstonLogger.js";
 import { API_ERROR } from "./Utilities/ApiError.js";
 import { API_RESPONSE } from "./Utilities/ApiResponse.js";
 
@@ -189,7 +189,7 @@ APPLICATION.use("/api/v1/user", USER_ROUTERS);
  *********************/
 APPLICATION.use((Error, Request, Response, Next) => {
     LOG_ERROR({ label: "Application.js", service: "Middleware", error: Error.stack }); // Log error details for internal use
-    throw new API_ERROR(500, "Something broke...!"); // Generic message for users
+    throw new API_ERROR(500, "Something broke...!", Error.stack); // Generic message for users
 });
 
 /*********************
@@ -197,7 +197,8 @@ APPLICATION.use((Error, Request, Response, Next) => {
  * Sends a 404 status and message when a requested route is not found.
  *********************/
 APPLICATION.use((Request, Response, Next) => {
-    throw new API_ERROR(404, "Route not found...!"); // Send a 404 status and message
+    const Error = new API_ERROR(404, "Route not found...!"); // Send a 404 status and message
+    Next(Error); // Pass the error to the next middleware
 });
 
 /*********************
