@@ -17,12 +17,30 @@ const ROUTER = EXPRESS.Router();
 import { REGISTER_NEW_USER, } from "../Controllers/User.Controller.js";
 
 /*********************
+ * Import custom middleware functions.
+ * - UPLOAD: This function will handle the logic for Multer middleware instance configured with the defined storage.
+ *********************/
+import { UPLOAD } from "../Middlewares/Multer.Middleware.js";
+
+/*********************
  * Define a route for the "/registerNewUser" endpoint.
  * - ROUTER.route("/registerNewUser"): This defines a route path.
  * - .post(REGISTER_NEW_USER): This specifies that the route will handle POST requests
  *   and maps the REGISTER_NEW_USER controller function to this route.
  *********************/
-ROUTER.route("/registerNewUser").post(REGISTER_NEW_USER);
+ROUTER.route("/registerNewUser").post(
+    UPLOAD.fields([
+        {
+            name: "avatar", // name should be same as in User.Model schema.
+            maxCount: 1
+        },
+        {
+            name: "coverImage", // name should be same as in User.Model schema.
+            maxCount: 1
+        }
+    ]),
+    REGISTER_NEW_USER
+);
 
 /*********************
  * Export the Router instance.
