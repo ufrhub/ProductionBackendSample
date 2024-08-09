@@ -73,7 +73,7 @@ const CONNECT_DATABASE = async () => {
     }
 
     try {
-        const ConnectionInstance = await MONGOOSE.connect(`${MongoDB_URI}/${DATABASE_NAME}`, {
+        const CONNECTION_INSTANCE = await MONGOOSE.connect(`${MongoDB_URI}/${DATABASE_NAME}`, {
             serverSelectionTimeoutMS: 10000, // Timeout after 10s instead of 30s
             socketTimeoutMS: 60000, // Close sockets after 60 seconds of inactivity
         });
@@ -84,7 +84,7 @@ const CONNECT_DATABASE = async () => {
             service: "Mongoose Connect",
             message: {
                 MESSAGE: `MongoDB Database Connected...!`,
-                DATABASE_HOST: ConnectionInstance.connection.host,
+                DATABASE_HOST: CONNECTION_INSTANCE.connection.host,
             }
         });
     } catch (error) {
