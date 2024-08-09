@@ -14,7 +14,6 @@ import JSON_WEB_TOKEN from "jsonwebtoken";
 /*********************
  * Import custom modules and functions.
  * - Constants: Various constant values used throughout the code.
- * - LOG_ERROR, LOG_WARN, LOG_INFO: Logging functions for different log levels.
  *********************/
 import { SAVE } from "../Utilities/Constants.js";
 
