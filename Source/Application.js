@@ -29,6 +29,7 @@ import MORGAN from "morgan";
  * - START_WEB_SOCKET_SERVER: Function to start a WebSocket server.
  * - LOG_ERROR, LOG_INFO: Logging functions for different log levels.
  * - API_RESPONSE: Response success messages.
+ * - API_ERROR: Response error messages.
  *********************/
 import {
     ERROR,
@@ -42,6 +43,7 @@ import {
 import { START_WEB_SOCKET_SERVER } from "./WebSocket.js";
 import { LOG_ERROR, LOG_INFO } from "./Utilities/WinstonLogger.js";
 import { API_RESPONSE } from "./Utilities/ApiResponse.js";
+import { API_ERROR } from "./Utilities/ApiError.js";
 
 /*********************
  * Determine the directory name (__dirname) of the current module.
@@ -175,7 +177,7 @@ APPLICATION.get('/health', (Request, Response) => {
                     message: `Worker ${PROCESS.pid} is handling the task...!`, // Send a JSON response with a message
                 }
             ],
-            "User registered successfully...!")
+            "Successfully Connected To The Server...!")
     );
 });
 APPLICATION.use("/api/v1", TestRouters);
@@ -187,13 +189,21 @@ APPLICATION.use("/api/v1/user", USER_ROUTERS);
  *********************/
 APPLICATION.use((Error, Request, Response, Next) => {
     LOG_ERROR({ label: "Application.js", service: "Middleware", error: Error.stack }); // Log error details for internal use
-    return Response.status(Error.statusCode).json({
-        statusCode: Error.statusCode,
-        success: Error.success,
-        data: Error.data,
-        message: Error.message,
-        errors: Error.errors,
-    });
+
+    if (Error instanceof API_ERROR) {
+        return Response.status(Error.statusCode).json({
+            statusCode: Error.statusCode,
+            success: Error.success,
+            data: Error.data,
+            message: Error.message,
+            errors: Error.errors,
+        });
+    } else {
+        return Response.status(500).json({
+            success: false,
+            message: 'Internal Server Error',
+        });
+    }
 });
 
 /*********************
@@ -206,7 +216,7 @@ APPLICATION.use((Request, Response, Next) => {
         success: false,
         data: null,
         message: "Route not found...!",
-        errors: "Route not found...!",
+        errors: ["Route not found...!"],
     }); // Send a 404 status and message
 });
 
