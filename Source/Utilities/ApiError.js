@@ -11,7 +11,7 @@ class API_ERROR extends Error {
      * - @param {string} [stack=""] - An optional stack trace. If not provided, a stack trace will be generated.
      *******/
     constructor(
-        statusCode,
+        statusCode = 500,
         message = "Something went wrong...!",
         errors = [],
         stack = ""
