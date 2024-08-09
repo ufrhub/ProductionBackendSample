@@ -1,7 +1,8 @@
-import { ASYNCHRONOUS_HANDLER, ASYNCHRONOUS_HANDLER_TryCatch } from "../Utilities/AsyncHandler.js";
+import { ASYNCHRONOUS_HANDLER, ASYNCHRONOUS_HANDLER_TryCatch } from "../Utilities/AsynchronousHandler.js";
 import { API_ERROR } from "../Utilities/ApiError.js";
 import { USER } from "../Models/User.Model.js";
 import { UPLOAD_FILE_ON_CLOUDINARY } from "../Utilities/Cloudinary.js";
+import { API_RESPONSE } from "../Utilities/ApiResponse.js";
 
 export const REGISTER_NEW_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
     // get user details from frontend
@@ -29,32 +30,39 @@ export const REGISTER_NEW_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) 
         throw new API_ERROR(400, "All fields are required...!"); // Bad Request
     }
 
-    const existingUser = await USER.findOne({
+    const ExistingUser = await USER.findOne({
         $or: [{ username: username }, { email: email }]
     });
 
-    if (existingUser) throw new API_ERROR(400, "User already exist...!"); // Bad Request
+    if (ExistingUser) throw new API_ERROR(400, "User already exist...!"); // Bad Request
 
-    const avatarLocalPath = Request.files?.avatar[0]?.path;
-    let coverImageLocalPath;
+    const AvatarLocalPath = Request.files?.avatar[0]?.path;
+    let CoverImageLocalPath;
 
-    if (!avatarLocalPath) throw new API_ERROR(400, "Avatar file is required...!"); // Bad Request
+    if (!AvatarLocalPath) throw new API_ERROR(400, "Avatar file is required...!"); // Bad Request
 
     if (Request.files && Array.isArray(Request.files.coverImage) && Request.files.coverImage.length > 0) {
-        coverImageLocalPath = Request.files.coverImage[0].path;
+        CoverImageLocalPath = Request.files.coverImage[0].path;
     }
 
-    const uploadAvatarOnCloudinary = await UPLOAD_FILE_ON_CLOUDINARY(avatarLocalPath);
-    const uploadCoverImageOnCloudinary = await UPLOAD_FILE_ON_CLOUDINARY(coverImageLocalPath);
+    const UploadAvatarOnCloudinary = await UPLOAD_FILE_ON_CLOUDINARY(AvatarLocalPath);
+    const UploadCoverImageOnCloudinary = await UPLOAD_FILE_ON_CLOUDINARY(CoverImageLocalPath);
 
-    if (!uploadAvatarOnCloudinary) throw new API_ERROR(500, "Something went wrong while uploading avatar...!");
-    if (!uploadCoverImageOnCloudinary) throw new API_ERROR(500, "Something went wrong while uploading coverImage...!");
+    if (!UploadAvatarOnCloudinary) throw new API_ERROR(500, "Something went wrong while uploading avatar...!");
+    if (!UploadCoverImageOnCloudinary) throw new API_ERROR(500, "Something went wrong while uploading coverImage...!");
 
-    USER.create({
-        username,
+    const CreatedUser = await USER.create({
+        username: username.toLowerCase(),
         email,
         fullName,
         password,
-        avatar: uploadAvatarOnCloudinary.url
-    })
+        avatar: UploadAvatarOnCloudinary.url,
+        coverImage: CoverImageLocalPath?.url || "",
+    });
+
+    if (!CreatedUser) throw new API_ERROR(500, "Something went wrong while registering new User...!");
+
+    return Response.status(201).json(
+        new API_RESPONSE(200, CreatedUser._id, "User registered successfully...!")
+    );
 });
