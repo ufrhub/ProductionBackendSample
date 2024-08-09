@@ -57,7 +57,7 @@ export const REGISTER_NEW_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) 
         fullName,
         password,
         avatar: UploadAvatarOnCloudinary.url,
-        coverImage: CoverImageLocalPath?.url || "",
+        coverImage: UploadCoverImageOnCloudinary?.url || "",
     });
 
     if (!CreatedUser) throw new API_ERROR(500, "Something went wrong while registering new User...!");
