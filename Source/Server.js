@@ -93,38 +93,10 @@ if (PROCESS.platform !== 'win32') {
             message: `Primary Worker ${PROCESS.pid} is running...!`,
         });
 
-        /******* 
-         * Connect to Redis Database in the Primary Worker process
-         * When the connection is successful, attempt to connect to the MongoDB database.
-         * If successful, fork worker processes for each available CPU core.
-         * If there's an error, log it.
-         *******/
-        REDIS.on(CONNECT, () => {
-            // Log that the Redis is connected to the cloud
-            LOG_INFO({
-                label: "Server.js",
-                service: "Redis Connection",
-                message: `Redis is connected to the cloud...!`,
-            });
-
-            /* Connect to MongoDB Database in the Primary Worker process */
-            CONNECT_DATABASE().then(() => {
-                /* Create multiple worker processes, one for each available CPU core */
-                for (let i = 0; i < totalCPUs; i++) {
-                    CLUSTER.fork();
-                }
-            }).catch((error) => {
-                // Log if error occured while connecting to the database
-                LOG_ERROR({
-                    label: "Server.js",
-                    service: "Connection",
-                    error: {
-                        error: error.message,
-                        message: `An error occured while connection to the Database`,
-                    },
-                });
-            });
-        });
+        /******* Create multiple worker processes, one for each available CPU core *******/
+        for (let i = 0; i < totalCPUs; i++) {
+            CLUSTER.fork();
+        }
 
         /******* 
          * Event Listener: A new worker process is created (forked).
@@ -140,7 +112,7 @@ if (PROCESS.platform !== 'win32') {
          *******/
         CLUSTER.on(ONLINE, (worker) => {
             if (ForkedWorkers.includes(worker.process.pid)) {
-                worker.send(DATABASE_CONNECTED);
+                worker.send(ONLINE);
             }
         });
 
@@ -272,14 +244,42 @@ if (PROCESS.platform !== 'win32') {
 
         /******* 
          * Event Listener: Listen for messages from the Primary Worker process.
-         * - If the message is DATABASE_CONNECTED, start the server.
+         * - If the message is ONLINE, start the server.
          * - If the message is SHUTDOWN, log the shutdown and exit the worker process.
          *******/
         PROCESS.on(MESSAGE, (message) => {
             try {
-                if (message === DATABASE_CONNECTED) {
-                    /* Start the server */
-                    START_SERVER();
+                if (message === ONLINE) {
+                    /******* 
+                     * Connect to Redis Database in the Worker process
+                     * When the connection is successful, attempt to connect to the MongoDB database.
+                     * If successful, start the server for each available CPU core.
+                     * If there's an error, log it.
+                     *******/
+                    REDIS.on(CONNECT, () => {
+                        // Log that the Redis is connected to the cloud
+                        LOG_INFO({
+                            label: "Server.js",
+                            service: "Redis Connection",
+                            message: `Redis is connected to the cloud...!`,
+                        });
+
+                        /* Connect to MongoDB Database in the Worker process */
+                        CONNECT_DATABASE().then(() => {
+                            /* Start the server */
+                            START_SERVER();
+                        }).catch((error) => {
+                            // Log if error occured while connecting to the database
+                            LOG_ERROR({
+                                label: "Server.js",
+                                service: "Connection",
+                                error: {
+                                    error: error.message,
+                                    message: `An error occured while connection to the Database`,
+                                },
+                            });
+                        });
+                    });
                 }
 
                 if (message === SHUTDOWN) {
