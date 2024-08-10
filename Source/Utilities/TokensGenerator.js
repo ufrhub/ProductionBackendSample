@@ -1,17 +1,17 @@
 /*********************
  * Import custom modules and functions.
- * - ASYNCHRONOUS_HANDLER, ASYNCHRONOUS_HANDLER_TryCatch: Wrappers to handle asynchronous operations and error handling.
- * - 
+ * - API_ERROR: Custom error class for handling API errors.
  * - USER: Mongoose model representing the User schema.
- * - UPLOAD_FILE_ON_CLOUDINARY: Function to upload files to Cloudinary.
- * - 
  *********************/
 import { USER } from "../Models/User.Model.js";
 import { API_ERROR } from "./ApiError";
 
-export const GENERATE_ACCESS_TOKEN = async ({ User, _id, username, email }) => {
+export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, email }) => {
     if (User) {
+        const AccessToken = User.GenerateAccessToken();
+        const RefreshToken = User.GenerateRefreshToken();
 
+        return { AccessToken, RefreshToken };
     }
 
     if (_id) {
@@ -24,6 +24,11 @@ export const GENERATE_ACCESS_TOKEN = async ({ User, _id, username, email }) => {
                 ]
             );
         }
+
+        const AccessToken = User.GenerateAccessToken();
+        const RefreshToken = User.GenerateRefreshToken();
+
+        return { AccessToken, RefreshToken };
     }
 
     if (username || email) {
@@ -38,9 +43,12 @@ export const GENERATE_ACCESS_TOKEN = async ({ User, _id, username, email }) => {
                 ]
             );
         }
+
+        const AccessToken = User.GenerateAccessToken();
+        const RefreshToken = User.GenerateRefreshToken();
+
+        return { AccessToken, RefreshToken };
     }
 
     return null;
 }
-
-export const GENERATE_REFRESH_TOKEN = () => { }

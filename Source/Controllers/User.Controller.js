@@ -11,6 +11,7 @@ import { API_ERROR } from "../Utilities/ApiError.js";
 import { USER } from "../Models/User.Model.js";
 import { UPLOAD_FILE_ON_CLOUDINARY } from "../Utilities/Cloudinary.js";
 import { API_RESPONSE } from "../Utilities/ApiResponse.js";
+import { GENERATE_REFRESH_AND_ACCESS_TOKEN } from "../Utilities/TokensGenerator.js";
 
 /*********************
  * Define the REGISTER_NEW_USER controller.
@@ -142,5 +143,34 @@ export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
 
     if (!isPasswordMatched) throw new API_ERROR(400, "Incorrect password...!");
 
+    const { AccessToken, RefreshToken } = GENERATE_REFRESH_AND_ACCESS_TOKEN(User);
+    const UserData = {
+        _id: User._id,
+        username: User.username,
+        email: User.email,
+        fullName: User.fullName,
+        avatar: User.avatar,
+        coverImage: User.coverImage,
+        watchHistory: User.watchHistory,
+        accessToken: AccessToken,
+        refreshToken: RefreshToken,
+    }
 
+    const CookieOptions = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return Response.status(200)
+        .cookie("accessToken", AccessToken, CookieOptions)
+        .cookie("refreshToken", RefreshToken, CookieOptions)
+        .json(
+            new API_RESPONSE(
+                200,
+                {
+                    user: UserData,
+                },
+                "User logged in Successfully...!"
+            )
+        );
 });
