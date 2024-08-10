@@ -109,3 +109,36 @@ export const REGISTER_NEW_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) 
         new API_RESPONSE(200, CreatedUser._id, "User registered successfully...!")
     );
 });
+
+export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
+    // req body -> data
+    // username or email
+    // find the user
+    // password check
+    // access and referesh token
+    // send cookie
+
+    const {
+        username,
+        email,
+        password
+    } = Request.body;
+
+    if (!username || !email) {
+        throw new API_ERROR(400, "Username or email required...!");
+    }
+
+    if (!password) {
+        throw new API_ERROR(400, "Password required...!");
+    }
+
+    const User = await USER.findOne({
+        $or: [{ username: username.toLowerCase() }, { email: email.toLowerCase() }]
+    });
+
+    if (!User) throw new API_ERROR(404, "User does not exist with this username or email...!");
+
+    const isPasswordMatched = await User.isPasswordCorrect(password);
+
+    if (!isPasswordMatched) throw new API_ERROR(400, "Incorrect password...!");
+});

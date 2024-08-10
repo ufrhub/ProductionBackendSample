@@ -79,7 +79,7 @@ const ASYNCHRONOUS_HANDLER_TryCatch = (RequestHandler) => async (Request, Respon
         Response.status(error.code || 500).json({
             success: false,
             message: error.message
-        })
+        });
     }
 }
 
