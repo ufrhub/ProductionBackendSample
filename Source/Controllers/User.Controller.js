@@ -143,7 +143,7 @@ export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
 
     if (!isPasswordMatched) throw new API_ERROR(400, "Incorrect password...!");
 
-    const { AccessToken, RefreshToken } = GENERATE_REFRESH_AND_ACCESS_TOKEN(User);
+    const { AccessToken, RefreshToken } = GENERATE_REFRESH_AND_ACCESS_TOKEN({ User });
     const UserData = {
         _id: User._id,
         username: User.username,

@@ -4,7 +4,7 @@
  * - USER: Mongoose model representing the User schema.
  *********************/
 import { USER } from "../Models/User.Model.js";
-import { API_ERROR } from "./ApiError";
+import { API_ERROR } from "./ApiError.js";
 
 export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, email }) => {
     if (User) {

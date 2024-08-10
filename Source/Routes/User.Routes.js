@@ -14,7 +14,7 @@ const ROUTER = EXPRESS.Router();
  * Import custom controller functions.
  * - REGISTER_NEW_USER: This function will handle the logic for registering a new user.
  *********************/
-import { REGISTER_NEW_USER, } from "../Controllers/User.Controller.js";
+import { REGISTER_NEW_USER, LOGIN_USER } from "../Controllers/User.Controller.js";
 
 /*********************
  * Import custom middleware functions.
@@ -44,7 +44,7 @@ import { UPLOAD } from "../Middlewares/Multer.Middleware.js";
  * - When a POST request is made to "/registerNewUser", the UPLOAD middleware first handles the file uploads
  *   for `avatar` and `coverImage`, and then the REGISTER_NEW_USER function processes the request.
  *********************/
-ROUTER.route("/registerNewUser").post(
+ROUTER.route("/register").post(
     UPLOAD.fields([
         {
             name: "avatar", // name should be same as in User.Model schema.
@@ -57,6 +57,16 @@ ROUTER.route("/registerNewUser").post(
     ]),
     REGISTER_NEW_USER
 );
+
+/********************* 
+ * Define a route for the "/login" endpoint.
+ * - ROUTER.route("/login"): Defines a route path for user login.
+ *
+ * Controller:
+ * - LOGIN_USER: This function handles the logic for user login, 
+ *   including verifying user credentials and generating authentication tokens.
+ *********************/
+ROUTER.route("/login").post(LOGIN_USER);
 
 /*********************
  * Export the Router instance.
