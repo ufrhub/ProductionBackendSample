@@ -18,15 +18,31 @@ import { REGISTER_NEW_USER, } from "../Controllers/User.Controller.js";
 
 /*********************
  * Import custom middleware functions.
- * - UPLOAD: This function will handle the logic for Multer middleware instance configured with the defined storage.
+ * - UPLOAD: A Multer middleware instance configured to handle file uploads. 
+ *   This middleware is used for handling multipart/form-data, which is primarily used for uploading files.
+ *   The storage configuration defines where and how the uploaded files are stored.
  *********************/
 import { UPLOAD } from "../Middlewares/Multer.Middleware.js";
 
 /*********************
  * Define a route for the "/registerNewUser" endpoint.
- * - ROUTER.route("/registerNewUser"): This defines a route path.
- * - .post(REGISTER_NEW_USER): This specifies that the route will handle POST requests
- *   and maps the REGISTER_NEW_USER controller function to this route.
+ * - ROUTER.route("/registerNewUser"): Defines a route path for user registration.
+ * 
+ * Middleware:
+ * - UPLOAD.fields([...]): This middleware handles file uploads for the specified fields.
+ *   - The `fields` method allows multiple file fields with different names to be uploaded.
+ *   - `name: "avatar"`: Specifies that the uploaded file should be assigned to the `avatar` field.
+ *   - `maxCount: 1`: Limits the number of files for this field to 1.
+ *   - `name: "coverImage"`: Specifies that the uploaded file should be assigned to the `coverImage` field.
+ *   - `maxCount: 1`: Limits the number of files for this field to 1.
+ * 
+ * Controller:
+ * - REGISTER_NEW_USER: This function is called after the files are uploaded and handles the logic
+ *   for registering a new user, including saving user data to the database.
+ * 
+ * Summary:
+ * - When a POST request is made to "/registerNewUser", the UPLOAD middleware first handles the file uploads
+ *   for `avatar` and `coverImage`, and then the REGISTER_NEW_USER function processes the request.
  *********************/
 ROUTER.route("/registerNewUser").post(
     UPLOAD.fields([
