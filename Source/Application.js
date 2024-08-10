@@ -28,8 +28,8 @@ import MORGAN from "morgan";
  * - Constants: Various constant values used throughout the code.
  * - START_WEB_SOCKET_SERVER: Function to start a WebSocket server.
  * - LOG_ERROR, LOG_INFO: Logging functions for different log levels.
- * - API_RESPONSE: Response success messages.
- * - API_ERROR: Response error messages.
+ * - API_RESPONSE: Custom class for standardized API responses.
+ * - API_ERROR: Custom error class for handling API errors.
  *********************/
 import {
     ERROR,
@@ -242,10 +242,24 @@ const START_SERVER = async () => {
         /******* 
          * Event Listener: Handle Application-specific Errors 
          * Listen for 'error' events and log the error details.
+         * If an error occurs, the API_ERROR custom class is thrown with the relevant status code, 
+         *  message, additional error details, and an optional stack trace.
          *******/
         APPLICATION.on(ERROR, (error) => {
             LOG_ERROR({ label: "Application.js", service: "Server", error: `Application Error: ${error.message}` });
-            throw error;
+
+            throw new API_ERROR(
+                error.statusCode || 500,
+                error.message || "An unknown error occurred...!",
+                [
+                    {
+                        label: "Application.js",
+                        service: "START_SERVER APPLICATION.on(ERROR)",
+                        error: `Application Error: ${error.message}`
+                    }
+                ],
+                error.stack // Optional: Include the original stack trace
+            );
         });
 
         /******* Start the web socket server. *******/

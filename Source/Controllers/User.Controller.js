@@ -55,7 +55,7 @@ export const REGISTER_NEW_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) 
      * - If such a user exists, throw a Bad Request (400) error.
      *******/
     const ExistingUser = await USER.findOne({
-        $or: [{ username }, { email }]
+        $or: [{ username: username.toLowerCase() }, { email: email.toLowerCase() }]
     });
 
     if (ExistingUser) throw new API_ERROR(400, "User already exist...!"); // Bad Request
@@ -124,7 +124,7 @@ export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
         password
     } = Request.body;
 
-    if (!username || !email) {
+    if (!username && !email) {
         throw new API_ERROR(400, "Username or email required...!");
     }
 
@@ -141,4 +141,6 @@ export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
     const isPasswordMatched = await User.isPasswordCorrect(password);
 
     if (!isPasswordMatched) throw new API_ERROR(400, "Incorrect password...!");
+
+
 });
