@@ -33,6 +33,7 @@ CLOUDINARY.config({
  * - If LocalFilePath is not provided, return null.
  * - If LocalFilePath is provided, upload the file to Cloudinary with automatic resource type detection.
  * - On success, logs the response from Cloudinary and returns it.
+ * - After a successful upload, delete the local file using `unlinkSync` to prevent leftover files.
  * - On failure, deletes the local file using `unlinkSync` to ensure that the failed upload does not leave unwanted files on the filesystem.
  * - Logs the error and returns null if the upload fails or LocalFilePath is not provided.
  *********************/
