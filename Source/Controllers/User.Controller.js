@@ -5,6 +5,7 @@
  * - USER: Mongoose model representing the User schema.
  * - UPLOAD_FILE_ON_CLOUDINARY: Function to upload files to Cloudinary.
  * - API_RESPONSE: Custom class for standardized API responses.
+ * - GENERATE_REFRESH_AND_ACCESS_TOKEN: Function to generate JWT access and refresh tokens.
  *********************/
 import { ASYNCHRONOUS_HANDLER, ASYNCHRONOUS_HANDLER_TryCatch } from "../Utilities/AsynchronousHandler.js";
 import { API_ERROR } from "../Utilities/ApiError.js";
@@ -111,6 +112,11 @@ export const REGISTER_NEW_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) 
     );
 });
 
+/*********************
+ * Define the LOGIN_USER controller.
+ * - Handles user login by validating input, checking for existing users,
+ *   verifying the password, generating JWT tokens, and returning a response.
+ *********************/
 export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
     // req body -> data
     // username or email
@@ -119,31 +125,65 @@ export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
     // access and referesh token
     // send cookie
 
+    /*******
+     * Destructure required fields from the request body.
+     * - Either `username` or `email` is required for login.
+     * - `password` is also required.
+     *******/
     const {
         username,
         email,
         password
     } = Request.body;
 
+    /*******
+     * Validate that either `username` or `email` is provided.
+     * - If neither is provided, throw a Bad Request (400) error.
+     *******/
     if (!username && !email) {
         throw new API_ERROR(400, "Username or email required...!");
     }
 
+    /*******
+     * Validate that the `password` is provided.
+     * - If the password is missing, throw a Bad Request (400) error.
+     *******/
     if (!password) {
         throw new API_ERROR(400, "Password required...!");
     }
 
-    const User = await USER.findOne({
-        $or: [{ username: username.toLowerCase() }, { email: email.toLowerCase() }]
-    });
+    let User;
+
+    /*******
+     * Find the user in the database based on the provided `username` or `email`.
+     * - If a user with the provided credentials does not exist, throw a Not Found (404) error.
+     *******/
+    if (username) {
+        User = await USER.findOne({ username: username.toLowerCase() });
+    } else if (email) {
+        User = await USER.findOne({ email: email.toLowerCase() });
+    }
 
     if (!User) throw new API_ERROR(404, "User does not exist with this username or email...!");
 
+    /*******
+     * Check if the provided password matches the user's stored password.
+     * - If the password is incorrect, throw a Bad Request (400) error.
+     *******/
     const isPasswordMatched = await User.isPasswordCorrect(password);
 
     if (!isPasswordMatched) throw new API_ERROR(400, "Incorrect password...!");
 
+    /*******
+     * Generate access and refresh tokens for the user.
+     * - These tokens will be used for authentication and session management.
+     *******/
     const { AccessToken, RefreshToken } = GENERATE_REFRESH_AND_ACCESS_TOKEN({ User });
+
+    /*******
+     * Prepare the user data to be returned in the response.
+     * - Include only necessary fields and exclude sensitive data like passwords.
+     *******/
     const UserData = {
         _id: User._id,
         username: User.username,
@@ -156,11 +196,20 @@ export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
         refreshToken: RefreshToken,
     }
 
+    /*******
+     * Define options for setting cookies.
+     * - `httpOnly` ensures the cookie is only accessible by the web server.
+     * - `secure` ensures the cookie is sent over HTTPS.
+     *******/
     const CookieOptions = {
         httpOnly: true,
         secure: true
     }
 
+    /*******
+     * Send the response with the user data and set the access and refresh tokens in cookies.
+     * - Return a success status (200) with the user data and tokens.
+     *******/
     return Response.status(200)
         .cookie("accessToken", AccessToken, CookieOptions)
         .cookie("refreshToken", RefreshToken, CookieOptions)
