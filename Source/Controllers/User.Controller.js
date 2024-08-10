@@ -133,7 +133,7 @@ export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
     const {
         username,
         email,
-        password
+        password,
     } = Request.body;
 
     /*******

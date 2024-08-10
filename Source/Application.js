@@ -188,7 +188,7 @@ APPLICATION.use("/api/v1/user", USER_ROUTERS);
  * Logs the error details using the LOG_ERROR function and sends a generic error message to the client.
  *********************/
 APPLICATION.use((Error, Request, Response, Next) => {
-    LOG_ERROR({ label: "Application.js", service: "Middleware", error: Error.stack }); // Log error details for internal use
+    LOG_ERROR({ label: "Application.js", service: "Error Handling Middleware", error: Error.stack }); // Log error details for internal use
 
     if (Error instanceof API_ERROR) {
         return Response.status(Error.statusCode).json({
