@@ -74,6 +74,6 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
         /*******
          * If an error occurs during the process, throw an API_ERROR with the error message.
          *******/
-        throw new API_ERROR(500, error);
+        throw new API_ERROR(500, error?.message, [error], error.stack);
     }
 }

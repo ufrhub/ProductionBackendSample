@@ -255,7 +255,7 @@ const START_SERVER = async () => {
                     {
                         label: "Application.js",
                         service: "START_SERVER APPLICATION.on(ERROR)",
-                        error: `Application Error: ${error.message}`
+                        error: `Application Error: ${error}`,
                     }
                 ],
                 error.stack // Optional: Include the original stack trace

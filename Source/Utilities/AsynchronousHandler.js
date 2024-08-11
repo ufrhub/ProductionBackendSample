@@ -1,7 +1,9 @@
 /*********************
  * Import custom modules and functions.
+ * - API_ERROR: Custom error class for handling API errors.
  * - LOG_ERROR: Logging functions for error logs.
  *********************/
+import { API_ERROR } from "./ApiError.js";
 import { LOG_ERROR } from "./WinstonLogger.js";
 
 /********************* 
@@ -18,41 +20,27 @@ const ASYNCHRONOUS_HANDLER = (RequestHandler) => {
      * This returned function wraps the original RequestHandler function and includes error-handling logic.
      *******/
     return (Request, Response, Next) => {
-        try {
-            /*******
+        /*******
              * The RequestHandler is called with the Request, Response, and Next
              * arguments. If the handler returns a promise, Promise.resolve() will
              * ensure that it's handled. If an error occurs during the execution of
              * the handler, it will be caught and passed to the Next() function,
              * which is an Express middleware function for handling errors.
              *******/
-            Promise.resolve(RequestHandler(Request, Response, Next))
-                .catch((error) => {
-                    // Log the error
-                    LOG_ERROR({
-                        label: "AsynchronousHandler.js",
-                        service: "catch",
-                        error: `Error in RequestHandler: ${error}`
-                    });
-
-                    /*******
-                     * Pass the error to the next middleware function for handling.
-                     *******/
-                    Next(error);
+        Promise.resolve(RequestHandler(Request, Response, Next))
+            .catch((error) => {
+                // Log the error
+                LOG_ERROR({
+                    label: "AsynchronousHandler.js",
+                    service: "catch",
+                    error: `Error in RequestHandler: ${error}`
                 });
-        } catch (error) {
-            // If a synchronous error occurs, log the error
-            LOG_ERROR({
-                label: "AsynchronousHandler.js",
-                service: "catch",
-                error: `Synchronous error in RequestHandler: ${error}`
-            });
 
-            /*******
-             * Pass the error to the next middleware function for handling.
-             *******/
-            Next(error);
-        }
+                /*******
+                 * Pass the error to the next middleware function for handling.
+                 *******/
+                Next(error);
+            });
     }
 }
 
@@ -70,16 +58,14 @@ const ASYNCHRONOUS_HANDLER_TryCatch = (RequestHandler) => async (Request, Respon
         await RequestHandler(Request, Response, Next);
     } catch (error) {
         /*******
-         * If an error is thrown, it's caught in this block. The error response
-         * is sent back to the client with a status code. If the error object
-         * has a 'code' property, it's used as the status code; otherwise, a
-         * default of 500 (Internal Server Error) is used. The response contains
-         * a success flag set to false and the error message.
+         * Throws a new instance of the custom API_ERROR class.
+         * - `error.code || 500`: Uses the error's code property as the HTTP status code, or defaults to 500 if not available.
+         * - `error.message`: The error message to be included in the response.
+         * - `[error]`: An array containing the original error object, useful for additional context.
+         * - `error.stack`: The stack trace for debugging purposes, passed along with the error.
+         * This effectively propagates the error, ensuring that it can be caught and logged by other middleware.
          *******/
-        Response.status(error.code || 500).json({
-            success: false,
-            message: error.message
-        });
+        throw new API_ERROR(error.code || 500, error.message, [error], error.stack);
     }
 }
 
