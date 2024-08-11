@@ -226,8 +226,6 @@ export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
                     200,
                     {
                         user: UserData,
-                        accessToken: AccessToken,
-                        refreshToken: RefreshToken,
                     },
                     "User logged in Successfully...!"
                 )
