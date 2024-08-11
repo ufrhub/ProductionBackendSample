@@ -256,15 +256,24 @@ export const LOGOUT_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
 
         /*******
          * Update the user's document in the database to remove the refresh token.
-         * - Setting `refreshToken` to `undefined` effectively clears the token.
+         * - The `$unset` operator removes the specified field from the document.
+         * - Setting `refreshToken` to `1` effectively clears the token from the document.
          * - The `new: true` option returns the updated document.
+         * 
+         * Note: The `$set` operator (commented out) would set `refreshToken` to `null` instead of removing it.
          *******/
         await USER.findByIdAndUpdate(
             User,
             {
-                $set: {
-                    refreshToken: undefined,
-                }
+                $unset: {
+                    refreshToken: 1,
+                },
+
+                /*
+                    $set: {
+                        refreshToken: null,
+                    },
+                */
             },
             {
                 new: true,
@@ -286,8 +295,8 @@ export const LOGOUT_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
          * - Return a successful response indicating the user has been logged out.
          *******/
         return Response.status(200)
-            .clearCookie("accessToken", AccessToken, CookieOptions)
-            .clearCookie("refreshToken", RefreshToken, CookieOptions)
+            .clearCookie("accessToken", CookieOptions)
+            .clearCookie("refreshToken", CookieOptions)
             .json(
                 new API_RESPONSE(
                     200,
