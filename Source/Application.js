@@ -216,7 +216,7 @@ APPLICATION.use((Request, Response, Next) => {
         success: false,
         data: null,
         message: "Route not found...!",
-        errors: ["Route not found...!"],
+        errors: [{ message: "Route not found...!" }],
     }); // Send a 404 status and message
 });
 

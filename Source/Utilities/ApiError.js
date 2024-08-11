@@ -44,7 +44,7 @@ class API_ERROR extends Error {
         /*******
          * Set the errors property to the provided array of additional error details.
          *******/
-        this.errors = errors;
+        this.errors = errors.length > 0 ? errors : { message: message };
 
         /*******
          * If a custom stack trace is provided, set the stack property to it.
