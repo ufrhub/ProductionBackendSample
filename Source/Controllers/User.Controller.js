@@ -186,7 +186,7 @@ export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
          * Generate access and refresh tokens for the user.
          * - These tokens will be used for authentication and session management.
          *******/
-        const { AccessToken, RefreshToken } = GENERATE_REFRESH_AND_ACCESS_TOKEN({ User });
+        const { AccessToken, RefreshToken } = await GENERATE_REFRESH_AND_ACCESS_TOKEN({ User });
 
         /*******
          * Prepare the user data to be returned in the response.
@@ -201,7 +201,6 @@ export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
             coverImage: User.coverImage,
             watchHistory: User.watchHistory,
             accessToken: AccessToken,
-            refreshToken: RefreshToken,
         }
 
         /*******

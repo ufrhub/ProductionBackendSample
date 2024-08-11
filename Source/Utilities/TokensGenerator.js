@@ -20,8 +20,23 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
          * - Generate and return access and refresh tokens using methods on the `User` instance.
          *******/
         if (User) {
-            const AccessToken = User.GenerateAccessToken();
-            const RefreshToken = User.GenerateRefreshToken();
+            const AccessToken = await User.GenerateAccessToken();
+            const RefreshToken = await User.GenerateRefreshToken();
+
+            /*******
+             * Store the generated refresh token in the `refreshToken` field of the `User` object.
+             * - This line assigns the newly generated `RefreshToken` to the `refreshToken` field of the `User` instance.
+             * - Storing the refresh token in the database allows it to be invalidated if needed, enhancing security.
+             *******/
+            User.refreshToken = RefreshToken;
+
+            /*******
+             * Save the updated `User` object to the database without triggering validation.
+             * - The `save` method is called to persist the changes made to the `User` object, including the new `refreshToken`.
+             * - `{ validateBeforeSave: false }`: Disables validation checks before saving, which can be useful if other fields are incomplete 
+             *   or if validation is unnecessary for this specific operation.
+             *******/
+            await User.save({ validateBeforeSave: false });
 
             return { AccessToken, RefreshToken };
         }
@@ -29,7 +44,10 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
         /*******
          * If the user's `_id` is provided:
          * - Find the user by `_id` in the database.
-         * - If the user is found, generate and return access and refresh tokens.
+         * - If the user is found, generate access and refresh tokens.
+         * - Store the generated refresh token in the `refreshToken` field of the `AvailableUser` object.
+         * - Save the updated `AvailableUser` object to the database without triggering validation.
+         * - Return the AccessToken and RefreshToken.
          * - If the user is not found, throw an API_ERROR with a message indicating that the user does not exist.
          *******/
         if (_id) {
@@ -39,8 +57,23 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
                 throw new API_ERROR(500, "User does not exist with this _id...!");
             }
 
-            const AccessToken = User.GenerateAccessToken();
-            const RefreshToken = User.GenerateRefreshToken();
+            const AccessToken = await AvailableUser.GenerateAccessToken();
+            const RefreshToken = await AvailableUser.GenerateRefreshToken();
+
+            /*******
+             * Store the generated refresh token in the `refreshToken` field of the `AvailableUser` object.
+             * - This line assigns the newly generated `RefreshToken` to the `refreshToken` field of the `AvailableUser` instance.
+             * - Storing the refresh token in the database allows it to be invalidated if needed, enhancing security.
+             *******/
+            AvailableUser.refreshToken = RefreshToken;
+
+            /*******
+             * Save the updated `AvailableUser` object to the database without triggering validation.
+             * - The `save` method is called to persist the changes made to the `AvailableUser` object, including the new `refreshToken`.
+             * - `{ validateBeforeSave: false }`: Disables validation checks before saving, which can be useful if other fields are incomplete 
+             *   or if validation is unnecessary for this specific operation.
+             *******/
+            await AvailableUser.save({ validateBeforeSave: false });
 
             return { AccessToken, RefreshToken };
         }
@@ -48,7 +81,10 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
         /*******
          * If the user's `username` or `email` is provided:
          * - Find the user by `username` or `email` in the database.
-         * - If the user is found, generate and return access and refresh tokens.
+         * - If the user is found, generate access and refresh tokens.
+         * - Store the generated refresh token in the `refreshToken` field of the `AvailableUser` object.
+         * - Save the updated `AvailableUser` object to the database without triggering validation.
+         * - Return the AccessToken and RefreshToken.
          * - If the user is not found, throw an API_ERROR with a message indicating that the user does not exist.
          *******/
         if (username || email) {
@@ -57,11 +93,26 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
             });
 
             if (!AvailableUser) {
-                throw new API_ERROR(500, "User does not exist with this _id...!");
+                throw new API_ERROR(500, "User does not exist with this username or email...!");
             }
 
-            const AccessToken = User.GenerateAccessToken();
-            const RefreshToken = User.GenerateRefreshToken();
+            const AccessToken = await AvailableUser.GenerateAccessToken();
+            const RefreshToken = await AvailableUser.GenerateRefreshToken();
+
+            /*******
+             * Store the generated refresh token in the `refreshToken` field of the `AvailableUser` object.
+             * - This line assigns the newly generated `RefreshToken` to the `refreshToken` field of the `AvailableUser` instance.
+             * - Storing the refresh token in the database allows it to be invalidated if needed, enhancing security.
+             *******/
+            AvailableUser.refreshToken = RefreshToken;
+
+            /*******
+             * Save the updated `AvailableUser` object to the database without triggering validation.
+             * - The `save` method is called to persist the changes made to the `AvailableUser` object, including the new `refreshToken`.
+             * - `{ validateBeforeSave: false }`: Disables validation checks before saving, which can be useful if other fields are incomplete 
+             *   or if validation is unnecessary for this specific operation.
+             *******/
+            await AvailableUser.save({ validateBeforeSave: false });
 
             return { AccessToken, RefreshToken };
         }
