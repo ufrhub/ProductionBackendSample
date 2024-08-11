@@ -13,16 +13,22 @@ const ROUTER = EXPRESS.Router();
 /*********************
  * Import custom controller functions.
  * - REGISTER_NEW_USER: This function will handle the logic for registering a new user.
+ * - LOGIN_USER: This function will handle the logic for logging in a user.
+ * - LOGOUT_USER: This function will handle the logic for logging out a user.
  *********************/
-import { REGISTER_NEW_USER, LOGIN_USER } from "../Controllers/User.Controller.js";
+import { REGISTER_NEW_USER, LOGIN_USER, LOGOUT_USER } from "../Controllers/User.Controller.js";
 
 /*********************
  * Import custom middleware functions.
  * - UPLOAD: A Multer middleware instance configured to handle file uploads. 
  *   This middleware is used for handling multipart/form-data, which is primarily used for uploading files.
  *   The storage configuration defines where and how the uploaded files are stored.
+ * - AUTHENTICATE_USER: Middleware function that verifies the user's authentication status 
+ *   by checking the validity of the access token. This middleware ensures that only authenticated 
+ *   users can access certain routes, such as logging out.
  *********************/
 import { UPLOAD } from "../Middlewares/Multer.Middleware.js";
+import { AUTHENTICATE_USER } from "../Middlewares/Authentication.Middleware.js"
 
 /*********************
  * Define a route for the "/registerNewUser" endpoint.
@@ -67,6 +73,25 @@ ROUTER.route("/register").post(
  *   including verifying user credentials and generating authentication tokens.
  *********************/
 ROUTER.route("/login").post(LOGIN_USER);
+
+/*********************
+ * Define a route for the "/logout" endpoint.
+ * - ROUTER.route("/logout"): Defines a route path for user logout.
+ *
+ * Middleware:
+ * - AUTHENTICATE_USER: This middleware function is executed before the LOGOUT_USER controller. 
+ *   It verifies the user's authentication status by checking the access token. If the user is 
+ *   authenticated, the request proceeds to the LOGOUT_USER function; otherwise, an error is returned.
+ *
+ * Controller:
+ * - LOGOUT_USER: This function handles the logic for logging out the user, including clearing 
+ *   the user's authentication tokens from cookies and the database.
+ *
+ * Summary:
+ * - When a POST request is made to "/logout", the AUTHENTICATE_USER middleware first verifies the user's 
+ *   authentication status, and if successful, the LOGOUT_USER function processes the logout request.
+ *********************/
+ROUTER.route("/logout").post(AUTHENTICATE_USER, LOGOUT_USER);
 
 /*********************
  * Export the Router instance.
