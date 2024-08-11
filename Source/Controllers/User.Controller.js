@@ -64,21 +64,22 @@ export const REGISTER_NEW_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) 
         if (ExistingUser) throw new API_ERROR(400, "User already exist...!"); // Bad Request
 
         /*******
-         * Get the path of the avatar file from the uploaded files.
+         * Check if avatar and cover image file was uploaded.
+         * - if avatar and cover image file was uploaded, get its local file path.
          * - If no avatar file is provided, throw a Bad Request (400) error.
          *******/
-        const AvatarLocalPath = Request.files?.avatar[0]?.path;
+        let AvatarLocalPath;
         let CoverImageLocalPath;
 
-        if (!AvatarLocalPath) throw new API_ERROR(400, "Avatar file is required...!"); // Bad Request
+        if (Request.files) {
+            if (Array.isArray(Request.files.avatar) && Request.files.avatar.length > 0)
+                AvatarLocalPath = Request.files.avatar[0].path;
 
-        /*******
-         * Check if a cover image file was uploaded.
-         * - If a cover image was uploaded, get its local file path.
-         *******/
-        if (Request.files && Array.isArray(Request.files.coverImage) && Request.files.coverImage.length > 0) {
-            CoverImageLocalPath = Request.files.coverImage[0].path;
+            if (Array.isArray(Request.files.coverImage) && Request.files.coverImage.length > 0)
+                CoverImageLocalPath = Request.files.coverImage[0].path;
         }
+
+        if (!AvatarLocalPath) throw new API_ERROR(400, "Avatar file is required...!"); // Bad Request
 
         /*******
          * Upload the avatar and cover image files to Cloudinary.
