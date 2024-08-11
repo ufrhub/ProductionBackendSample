@@ -152,17 +152,13 @@ export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
         throw new API_ERROR(400, "Password required...!");
     }
 
-    let User;
-
     /*******
      * Find the user in the database based on the provided `username` or `email`.
      * - If a user with the provided credentials does not exist, throw a Not Found (404) error.
      *******/
-    if (username) {
-        User = await USER.findOne({ username: username.toLowerCase() });
-    } else if (email) {
-        User = await USER.findOne({ email: email.toLowerCase() });
-    }
+    const User = await USER.findOne({
+        $or: [{ username: username?.toLowerCase() }, { email: email?.toLowerCase() }]
+    });
 
     if (!User) throw new API_ERROR(404, "User does not exist with this username or email...!");
 
