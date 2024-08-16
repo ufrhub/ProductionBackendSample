@@ -192,11 +192,11 @@ APPLICATION.use((Error, Request, Response, Next) => {
 
     if (Error instanceof API_ERROR) {
         return Response.status(Error.statusCode).json({
-            statusCode: Error.statusCode,
-            success: Error.success,
-            data: Error.data,
-            message: Error.message,
-            errors: Error.errors,
+            statusCode: Error?.statusCode,
+            success: Error?.success,
+            data: Error?.data,
+            message: Error?.message,
+            errors: Error?.errors,
         });
     } else {
         return Response.status(500).json({
