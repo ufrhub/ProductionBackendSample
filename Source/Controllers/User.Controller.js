@@ -15,6 +15,16 @@ import { API_RESPONSE } from "../Utilities/ApiResponse.js";
 import { GENERATE_REFRESH_AND_ACCESS_TOKEN } from "../Utilities/TokensGenerator.js";
 
 /*********************
+ * Define options globally for setting cookies.
+ * - `httpOnly` ensures the cookie is only accessible by the web server.
+ * - `secure` ensures the cookie is sent over HTTPS.
+ *********************/
+const CookieOptions = {
+    httpOnly: true,
+    secure: true
+}
+
+/*********************
  * Define the REGISTER_NEW_USER controller.
  * - Handles user registration by validating input, checking for existing users, 
  *   uploading files to Cloudinary, creating the user in the database, and returning a response.
@@ -187,7 +197,7 @@ export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
          * Generate access and refresh tokens for the user.
          * - These tokens will be used for authentication and session management.
          *******/
-        const { AccessToken, RefreshToken } = await GENERATE_REFRESH_AND_ACCESS_TOKEN({ User });
+        const { AccessToken } = await GENERATE_REFRESH_AND_ACCESS_TOKEN({ User });
 
         /*******
          * Prepare the user data to be returned in the response.
@@ -205,22 +215,11 @@ export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
         }
 
         /*******
-         * Define options for setting cookies.
-         * - `httpOnly` ensures the cookie is only accessible by the web server.
-         * - `secure` ensures the cookie is sent over HTTPS.
-         *******/
-        const CookieOptions = {
-            httpOnly: true,
-            secure: true
-        }
-
-        /*******
          * Send the response with the user data and set the access and refresh tokens in cookies.
          * - Return a success status (200) with the user data and tokens.
          *******/
         return Response.status(200)
             .cookie("accessToken", AccessToken, CookieOptions)
-            .cookie("refreshToken", RefreshToken, CookieOptions)
             .json(
                 new API_RESPONSE(
                     200,
@@ -282,22 +281,11 @@ export const LOGOUT_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
         );
 
         /*******
-         * Define options for setting cookies.
-         * - `httpOnly` ensures the cookie is only accessible by the web server.
-         * - `secure` ensures the cookie is sent over HTTPS.
-         *******/
-        const CookieOptions = {
-            httpOnly: true,
-            secure: true
-        }
-
-        /*******
          * Clear the access and refresh tokens from the user's cookies.
          * - Return a successful response indicating the user has been logged out.
          *******/
         return Response.status(200)
             .clearCookie("accessToken", CookieOptions)
-            .clearCookie("refreshToken", CookieOptions)
             .json(
                 new API_RESPONSE(
                     200,

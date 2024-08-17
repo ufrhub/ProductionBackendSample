@@ -1,7 +1,7 @@
 /*********************
  * Import custom modules and functions.
- * - API_ERROR: Custom error class for handling API errors.
  * - USER: Mongoose model representing the User schema.
+ * - API_ERROR: Custom error class for handling API errors.
  *********************/
 import { USER } from "../Models/User.Model.js";
 import { API_ERROR } from "./ApiError.js";
@@ -21,7 +21,7 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
          *******/
         if (User) {
             const AccessToken = await User.GenerateAccessToken();
-            const RefreshToken = await User.GenerateRefreshToken();
+            const RefreshToken = await User.GenerateRefreshToken(AccessToken);
 
             /*******
              * Store the generated refresh token in the `refreshToken` field of the `User` object.
@@ -81,11 +81,11 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
         /*******
          * If the user's `username` or `email` is provided:
          * - Find the user by `username` or `email` in the database.
+         * - If the user is not found, throw an API_ERROR with a message indicating that the user does not exist.
          * - If the user is found, generate access and refresh tokens.
          * - Store the generated refresh token in the `refreshToken` field of the `AvailableUser` object.
          * - Save the updated `AvailableUser` object to the database without triggering validation.
          * - Return the AccessToken and RefreshToken.
-         * - If the user is not found, throw an API_ERROR with a message indicating that the user does not exist.
          *******/
         if (username || email) {
             const AvailableUser = await USER.findOne({

@@ -14,8 +14,10 @@ import JSON_WEB_TOKEN from "jsonwebtoken";
 /*********************
  * Import custom modules and functions.
  * - Constants: Various constant values used throughout the code.
+ * - API_ERROR: Custom error class for handling API errors.
  *********************/
 import { SAVE } from "../Utilities/Constants.js";
+import { API_ERROR } from "../Utilities/ApiError.js";
 
 /*********************
  * Define the User Schema
@@ -100,8 +102,8 @@ USER_SCHEMA.pre(SAVE, async function (Next) {
  * - isPasswordCorrect: Compares the provided password with the hashed password stored in the database.
  * - Returns true if the passwords match, false otherwise.
  *********************/
-USER_SCHEMA.methods.isPasswordCorrect = async function (password) {
-    return await BCRYPT.compare(password, this.password);
+USER_SCHEMA.methods.isPasswordCorrect = async function (Password) {
+    return await BCRYPT.compare(Password, this.password);
 }
 
 /*********************
@@ -129,10 +131,24 @@ USER_SCHEMA.methods.GenerateAccessToken = async function () {
  * - GenerateRefreshToken: Generates a JWT that contains only the user's ID.
  * - The token is signed with the REFRESH_TOKEN_SECRET from the environment variables and expires according to the REFRESH_TOKEN_EXPIRY.
  *********************/
-USER_SCHEMA.methods.GenerateRefreshToken = async function () {
+USER_SCHEMA.methods.GenerateRefreshToken = async function (AccessToken) {
+    if (!AccessToken) {
+        throw new API_ERROR(
+            500,
+            "Access Token not found...!",
+            [
+                {
+                    label: "User.Model.js",
+                    message: "Access Token not found...!",
+                }
+            ]
+        );
+    }
+
     return await JSON_WEB_TOKEN.sign(
         {
             _id: this._id,
+            accessToken: AccessToken
         },
         PROCESS.env.REFRESH_TOKEN_SECRET, // Secret key for signing the token
         {
