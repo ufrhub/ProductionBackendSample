@@ -22,6 +22,11 @@ class API_ERROR extends Error {
         super(message);
 
         /*******
+         * Set the name property to a string identifier for this error type.
+         *******/
+        this.name = "APIError";
+
+        /*******
          * Set the statusCode property to the provided status code.
          *******/
         this.statusCode = statusCode;
