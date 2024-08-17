@@ -1,9 +1,11 @@
 /*********************
  * Import custom modules and functions.
  * - USER: Mongoose model representing the User schema.
+ * - InsertIntoString: Helper function to insert string into the string.
  * - API_ERROR: Custom error class for handling API errors.
  *********************/
 import { USER } from "../Models/User.Model.js";
+import { InsertIntoString } from "./HelperFunctions.js";
 import { API_ERROR } from "./ApiError.js";
 
 /*********************
@@ -17,7 +19,10 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
     try {
         /*******
          * If the `User` object is provided directly:
-         * - Generate and return access and refresh tokens using methods on the `User` instance.
+         * - Generate access and refresh tokens.
+         * - Store the generated refresh token in the `refreshToken` field of the `User` object.
+         * - Save the updated `AvailableUser` object to the database without triggering validation.
+         * - Modify and return the AccessToken and RefreshToken.
          *******/
         if (User) {
             const AccessToken = await User.GenerateAccessToken();
@@ -38,17 +43,32 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
              *******/
             await User.save({ validateBeforeSave: false });
 
-            return { AccessToken, RefreshToken };
+            /*******
+             * Modify the AccessToken by inserting the User's `_id` before the second occurrence of the "." character.
+             * - This uses the `InsertIntoString` function to insert the `_id` into the token string.
+             * - The modified token enhances the token structure with additional information.
+             *******/
+            const UpdatedAccessToken = InsertIntoString({
+                InsertBefore: ".",
+                CountInsertBefore: 2,
+                OriginalString: AccessToken,
+                InsertStringBefore: User._id,
+            });
+
+            /*******
+             * Return the modified AccessToken and the RefreshToken.
+             *******/
+            return { AccessToken: UpdatedAccessToken, RefreshToken };
         }
 
         /*******
          * If the user's `_id` is provided:
          * - Find the user by `_id` in the database.
+         * - If the user is not found, throw an API_ERROR with a message indicating that the user does not exist.
          * - If the user is found, generate access and refresh tokens.
          * - Store the generated refresh token in the `refreshToken` field of the `AvailableUser` object.
          * - Save the updated `AvailableUser` object to the database without triggering validation.
-         * - Return the AccessToken and RefreshToken.
-         * - If the user is not found, throw an API_ERROR with a message indicating that the user does not exist.
+         * - Modify and return the AccessToken and RefreshToken.
          *******/
         if (_id) {
             const AvailableUser = await USER.findById(_id);
@@ -58,7 +78,7 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
             }
 
             const AccessToken = await AvailableUser.GenerateAccessToken();
-            const RefreshToken = await AvailableUser.GenerateRefreshToken();
+            const RefreshToken = await AvailableUser.GenerateRefreshToken(AccessToken);
 
             /*******
              * Store the generated refresh token in the `refreshToken` field of the `AvailableUser` object.
@@ -75,7 +95,22 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
              *******/
             await AvailableUser.save({ validateBeforeSave: false });
 
-            return { AccessToken, RefreshToken };
+            /*******
+             * Modify the AccessToken by inserting the User's `_id` before the second occurrence of the "." character.
+             * - This uses the `InsertIntoString` function to insert the `_id` into the token string.
+             * - The modified token enhances the token structure with additional information.
+             *******/
+            const UpdatedAccessToken = InsertIntoString({
+                InsertBefore: ".",
+                CountInsertBefore: 2,
+                OriginalString: AccessToken,
+                InsertStringBefore: _id,
+            });
+
+            /*******
+             * Return the modified AccessToken and the RefreshToken.
+             *******/
+            return { AccessToken: UpdatedAccessToken, RefreshToken };
         }
 
         /*******
@@ -85,7 +120,7 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
          * - If the user is found, generate access and refresh tokens.
          * - Store the generated refresh token in the `refreshToken` field of the `AvailableUser` object.
          * - Save the updated `AvailableUser` object to the database without triggering validation.
-         * - Return the AccessToken and RefreshToken.
+         * - Modify and return the AccessToken and RefreshToken.
          *******/
         if (username || email) {
             const AvailableUser = await USER.findOne({
@@ -97,7 +132,7 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
             }
 
             const AccessToken = await AvailableUser.GenerateAccessToken();
-            const RefreshToken = await AvailableUser.GenerateRefreshToken();
+            const RefreshToken = await AvailableUser.GenerateRefreshToken(AccessToken);
 
             /*******
              * Store the generated refresh token in the `refreshToken` field of the `AvailableUser` object.
@@ -114,7 +149,22 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
              *******/
             await AvailableUser.save({ validateBeforeSave: false });
 
-            return { AccessToken, RefreshToken };
+            /*******
+             * Modify the AccessToken by inserting the User's `_id` before the second occurrence of the "." character.
+             * - This uses the `InsertIntoString` function to insert the `_id` into the token string.
+             * - The modified token enhances the token structure with additional information.
+             *******/
+            const UpdatedAccessToken = InsertIntoString({
+                InsertBefore: ".",
+                CountInsertBefore: 2,
+                OriginalString: AccessToken,
+                InsertStringBefore: AvailableUser._id,
+            });
+
+            /*******
+             * Return the modified AccessToken and the RefreshToken.
+             *******/
+            return { AccessToken: UpdatedAccessToken, RefreshToken };
         }
 
         /*******
