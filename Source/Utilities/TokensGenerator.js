@@ -21,7 +21,7 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
          * If the `User` object is provided directly:
          * - Generate access and refresh tokens.
          * - Store the generated refresh token in the `refreshToken` field of the `User` object.
-         * - Save the updated `AvailableUser` object to the database without triggering validation.
+         * - Save the updated `User` object to the database without triggering validation.
          * - Modify and return the AccessToken and RefreshToken.
          *******/
         if (User) {
