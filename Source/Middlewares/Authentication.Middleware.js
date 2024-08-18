@@ -33,6 +33,14 @@ export const AUTHENTICATE_USER = ASYNCHRONOUS_HANDLER(async (Request, Response, 
         const AuthorizationHeader = Request.cookies?.accessToken || Request.header("Authorization")?.replace("Bearer ", "");
         if (!AuthorizationHeader) throw new API_ERROR(401, "Unauthorized request...!");
 
+        /*******
+         * Extract a specific part of the Authorization header.
+         * - `ExtractBefore: "."`: Extracts the substring up to the second occurrence of a period.
+         * - `CountExtractBefore: 2`: Specifies to count and extract up to the second occurrence.
+         * - `OriginalString: AuthorizationHeader`: The full Authorization header string.
+         * - `CharactersToExtractBefore: 24`: Extracts up to 24 characters before the specified position.
+         * - The extracted substring is stored in `ExtractedAuthorizationHeader`.
+         *******/
         const ExtractedAuthorizationHeader = EXTRACT_FROM_STRING({
             ExtractBefore: ".",
             CountExtractBefore: 2,
@@ -40,6 +48,10 @@ export const AUTHENTICATE_USER = ASYNCHRONOUS_HANDLER(async (Request, Response, 
             CharactersToExtractBefore: 24,
         });
 
+        /*******
+         * Assign the extracted token string to the `Token` variable.
+         * - `UpdatedString` is the extracted part from the previous operation.
+         *******/
         const Token = ExtractedAuthorizationHeader.UpdatedString;
 
         /*******
