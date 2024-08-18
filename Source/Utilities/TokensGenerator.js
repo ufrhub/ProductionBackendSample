@@ -1,11 +1,11 @@
 /*********************
  * Import custom modules and functions.
  * - USER: Mongoose model representing the User schema.
- * - InsertIntoString: Helper function to insert string into the string.
+ * - INSERT_INTO_STRING: Helper function to insert string into another string.
  * - API_ERROR: Custom error class for handling API errors.
  *********************/
 import { USER } from "../Models/User.Model.js";
-import { InsertIntoString } from "./HelperFunctions.js";
+import { INSERT_INTO_STRING } from "./HelperFunctions.js";
 import { API_ERROR } from "./ApiError.js";
 
 /*********************
@@ -45,10 +45,10 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
 
             /*******
              * Modify the AccessToken by inserting the User's `_id` before the second occurrence of the "." character.
-             * - This uses the `InsertIntoString` function to insert the `_id` into the token string.
+             * - This uses the `INSERT_INTO_STRING` function to insert the `_id` into the token string.
              * - The modified token enhances the token structure with additional information.
              *******/
-            const UpdatedAccessToken = InsertIntoString({
+            const UpdatedAccessToken = INSERT_INTO_STRING({
                 InsertBefore: ".",
                 CountInsertBefore: 2,
                 OriginalString: AccessToken,
@@ -97,10 +97,10 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
 
             /*******
              * Modify the AccessToken by inserting the User's `_id` before the second occurrence of the "." character.
-             * - This uses the `InsertIntoString` function to insert the `_id` into the token string.
+             * - This uses the `INSERT_INTO_STRING` function to insert the `_id` into the token string.
              * - The modified token enhances the token structure with additional information.
              *******/
-            const UpdatedAccessToken = InsertIntoString({
+            const UpdatedAccessToken = INSERT_INTO_STRING({
                 InsertBefore: ".",
                 CountInsertBefore: 2,
                 OriginalString: AccessToken,
@@ -151,10 +151,10 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
 
             /*******
              * Modify the AccessToken by inserting the User's `_id` before the second occurrence of the "." character.
-             * - This uses the `InsertIntoString` function to insert the `_id` into the token string.
+             * - This uses the `INSERT_INTO_STRING` function to insert the `_id` into the token string.
              * - The modified token enhances the token structure with additional information.
              *******/
-            const UpdatedAccessToken = InsertIntoString({
+            const UpdatedAccessToken = INSERT_INTO_STRING({
                 InsertBefore: ".",
                 CountInsertBefore: 2,
                 OriginalString: AccessToken,
@@ -173,8 +173,9 @@ export const GENERATE_REFRESH_AND_ACCESS_TOKEN = async ({ User, _id, username, e
         return null;
     } catch (error) {
         /*******
-         * If an error occurs during the process, throw an API_ERROR with the error message.
+         * If an error occurs during the process, throw an API_ERROR with the statusCode, 
+         *   error message, errors and error stack for debugging.
          *******/
-        throw new API_ERROR(500, error?.message, [error], error.stack);
+        throw new API_ERROR(error?.statusCode, error?.message, [error], error.stack);
     }
 }

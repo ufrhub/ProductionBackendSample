@@ -246,11 +246,11 @@ const START_SERVER = async () => {
          *  message, additional error details, and an optional stack trace.
          *******/
         APPLICATION.on(ERROR, (error) => {
-            LOG_ERROR({ label: "Application.js", service: "Server", error: `Application Error: ${error.message}` });
+            LOG_ERROR({ label: "Application.js", service: "Server", error: `Application Error: ${error?.message}` });
 
             throw new API_ERROR(
-                error.statusCode || 500,
-                error.message || "An unknown error occurred...!",
+                error?.statusCode || 500,
+                error?.message || "An unknown error occurred...!",
                 [
                     {
                         label: "Application.js",
@@ -258,7 +258,7 @@ const START_SERVER = async () => {
                         error: `Application Error: ${error}`,
                     }
                 ],
-                error.stack // Optional: Include the original stack trace
+                error?.stack // Optional: Include the original stack trace
             );
         });
 

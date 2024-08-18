@@ -89,7 +89,7 @@ export const REGISTER_NEW_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) 
                 CoverImageLocalPath = Request.files.coverImage[0].path;
         }
 
-        if (!AvatarLocalPath) throw new API_ERROR(400, "Avatar file is required...!"); // Bad Request
+        if (!AvatarLocalPath) throw new API_ERROR(404, "Avatar file is required...!"); // Bad Request
 
         /*******
          * Upload the avatar and cover image files to Cloudinary.
@@ -126,11 +126,11 @@ export const REGISTER_NEW_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) 
         /*******
          * If any error occurs during the execution of the try block:
          * - The error is caught in the catch block.
-         * - A new API_ERROR is thrown with a status code of 500 (Internal Server Error) 
-         *   and the original error message. This ensures that any unexpected issues are 
-         *   properly reported and handled, providing a consistent error response format.
+         * - A new API_ERROR is thrown with a status code and the original error message. 
+         *   This ensures that any unexpected issues are properly reported and handled, 
+         *   providing a consistent error response format.
          *******/
-        throw new API_ERROR(500, error?.message, [error], error.stack);
+        throw new API_ERROR(error?.statusCode, error?.message, [error], error?.stack);
     }
 });
 
@@ -233,11 +233,11 @@ export const LOGIN_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
         /*******
          * If any error occurs during the execution of the try block:
          * - The error is caught in the catch block.
-         * - A new API_ERROR is thrown with a status code of 500 (Internal Server Error) 
-         *   and the original error message. This ensures that any unexpected issues are 
-         *   properly reported and handled, providing a consistent error response format.
+         * - A new API_ERROR is thrown with a status code and the original error message. 
+         *   This ensures that any unexpected issues are properly reported and handled, 
+         *   providing a consistent error response format.
          *******/
-        throw new API_ERROR(500, error?.message, [error], error.stack);
+        throw new API_ERROR(error?.statusCode, error?.message, [error], error?.stack);
     }
 });
 
@@ -297,10 +297,10 @@ export const LOGOUT_USER = ASYNCHRONOUS_HANDLER(async (Request, Response) => {
         /*******
          * If any error occurs during the execution of the try block:
          * - The error is caught in the catch block.
-         * - A new API_ERROR is thrown with a status code of 500 (Internal Server Error) 
-         *   and the original error message. This ensures that any unexpected issues are 
-         *   properly reported and handled, providing a consistent error response format.
+         * - A new API_ERROR is thrown with a status code and the original error message. 
+         *   This ensures that any unexpected issues are properly reported and handled, 
+         *   providing a consistent error response format.
          *******/
-        throw new API_ERROR(500, error?.message, [error], error.stack);
+        throw new API_ERROR(error?.statusCode, error?.message, [error], error?.stack);
     }
 });

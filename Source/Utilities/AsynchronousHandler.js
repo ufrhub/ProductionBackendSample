@@ -59,13 +59,13 @@ const ASYNCHRONOUS_HANDLER_TryCatch = (RequestHandler) => async (Request, Respon
     } catch (error) {
         /*******
          * Throws a new instance of the custom API_ERROR class.
-         * - `error.code || 500`: Uses the error's code property as the HTTP status code, or defaults to 500 if not available.
-         * - `error.message`: The error message to be included in the response.
+         * - `error?.statusCode || 500`: Uses the error's code property as the HTTP status code, or defaults to 500 if not available.
+         * - `error?.message`: The error message to be included in the response.
          * - `[error]`: An array containing the original error object, useful for additional context.
-         * - `error.stack`: The stack trace for debugging purposes, passed along with the error.
+         * - `error?.stack`: The stack trace for debugging purposes, passed along with the error.
          * This effectively propagates the error, ensuring that it can be caught and logged by other middleware.
          *******/
-        throw new API_ERROR(error.code || 500, error.message, [error], error.stack);
+        throw new API_ERROR(error?.statusCode || 500, error?.message, [error], error?.stack);
     }
 }
 

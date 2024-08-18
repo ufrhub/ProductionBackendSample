@@ -10,10 +10,12 @@ import PROCESS from "node:process";
  * Import custom modules and functions.
  * - ASYNCHRONOUS_HANDLER, ASYNCHRONOUS_HANDLER_TryCatch: Wrappers to handle asynchronous operations and error handling.
  * - API_ERROR: Custom error class for handling API errors.
+ * - EXTRACT_FROM_STRING: Helper function that returns an object containing the extracted substrings.
  * - USER: Mongoose model representing the User schema.
  *********************/
 import { ASYNCHRONOUS_HANDLER } from "../Utilities/AsynchronousHandler.js";
 import { API_ERROR } from "../Utilities/ApiError.js";
+import { EXTRACT_FROM_STRING } from "../Utilities/HelperFunctions.js";
 import { USER } from "../Models/User.Model.js";
 
 /*********************
@@ -28,8 +30,17 @@ export const AUTHENTICATE_USER = ASYNCHRONOUS_HANDLER(async (Request, Response, 
          * Extract the JWT token from either cookies or the Authorization header.
          * - If no token is found, throw a 401 Unauthorized error.
          *******/
-        const Token = Request.cookies?.accessToken || Request.header("Authorization")?.replace("Bearer ", "");
-        if (!Token) throw new API_ERROR(401, "Unauthorized request...!");
+        const AuthorizationHeader = Request.cookies?.accessToken || Request.header("Authorization")?.replace("Bearer ", "");
+        if (!AuthorizationHeader) throw new API_ERROR(401, "Unauthorized request...!");
+
+        const ExtractedAuthorizationHeader = EXTRACT_FROM_STRING({
+            ExtractBefore: ".",
+            CountExtractBefore: 2,
+            OriginalString: AuthorizationHeader,
+            CharactersToExtractBefore: 24,
+        });
+
+        const Token = ExtractedAuthorizationHeader.UpdatedString;
 
         /*******
          * Verify the extracted token using the secret key stored in environment variables.
@@ -58,9 +69,9 @@ export const AUTHENTICATE_USER = ASYNCHRONOUS_HANDLER(async (Request, Response, 
     } catch (error) {
         /*******
          * If an error occurs during the authentication process:
-         * - A new API_ERROR is thrown with a status code of 500 (Internal Server Error).
+         * - A new API_ERROR is thrown with a status code.
          * - The original error message, additional error details, and stack trace are included.
          *******/
-        throw new API_ERROR(500, error?.message, [error], error.stack);
+        throw new API_ERROR(error?.statusCode, error?.message, [error], error?.stack);
     }
 });

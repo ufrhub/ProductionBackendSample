@@ -1,5 +1,5 @@
 /*********************
- * InsertIntoString Function
+ * INSERT_INTO_STRING Function
  * - This function inserts specified strings into a given string (`OriginalString`) at positions defined by the occurrence of certain characters.
  * - The function is highly customizable, allowing you to insert strings before or after specific characters.
  * 
@@ -15,7 +15,7 @@
  * Return:
  * - The function returns the updated string with the inserted content or undefined if required parameters are missing.
  *********************/
-export const InsertIntoString = ({
+export const INSERT_INTO_STRING = ({
     InsertBefore = "",
     CountInsertBefore = 1,
     InsertAfter = "",
@@ -88,7 +88,7 @@ export const InsertIntoString = ({
 }
 
 /*********************
- * ExtractFromSting Function
+ * EXTRACT_FROM_STRING Function
  * - This function extracts specified substrings from a given string (`OriginalString`) based on the occurrence of certain characters.
  * - The function can extract characters before and after specified markers and return the updated string after removal.
  * 
@@ -105,7 +105,7 @@ export const InsertIntoString = ({
  * - The function returns an object containing the extracted substrings (`StringBefore` and `StringAfter`) 
  *   and the `UpdatedString` with the removed parts.
  *********************/
-export const ExtractFromSting = ({
+export const EXTRACT_FROM_STRING = ({
     ExtractBefore = "",
     CountExtractBefore = 1,
     ExtractAfter = "",
