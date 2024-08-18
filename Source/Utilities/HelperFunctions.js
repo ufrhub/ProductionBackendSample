@@ -86,3 +86,127 @@ export const InsertIntoString = ({
      *******/
     return UpdatedString;
 }
+
+/*********************
+ * ExtractFromSting Function
+ * - This function extracts specified substrings from a given string (`OriginalString`) based on the occurrence of certain characters.
+ * - The function can extract characters before and after specified markers and return the updated string after removal.
+ * 
+ * Parameters:
+ * - ExtractBefore: The character before which the extraction should occur. (Default: empty string)
+ * - CountExtractBefore: The occurrence count of `ExtractBefore` at which extraction should happen. (Default: 1)
+ * - ExtractAfter: The character after which the extraction should occur. (Default: empty string)
+ * - CountExtractAfter: The occurrence count of `ExtractAfter` at which extraction should happen. (Default: 1)
+ * - OriginalString: The string from which substrings will be extracted. (Default: empty string)
+ * - CharactersToExtractBefore: The number of characters to extract before `ExtractBefore`. (Default: 0)
+ * - CharactersToExtractAfter: The number of characters to extract after `ExtractAfter`. (Default: 0)
+ * 
+ * Return:
+ * - The function returns an object containing the extracted substrings (`StringBefore` and `StringAfter`) 
+ *   and the `UpdatedString` with the removed parts.
+ *********************/
+export const ExtractFromSting = ({
+    ExtractBefore = "",
+    CountExtractBefore = 1,
+    ExtractAfter = "",
+    CountExtractAfter = 1,
+    OriginalString = "",
+    CharactersToExtractBefore = 0,
+    CharactersToExtractAfter = 0,
+}) => {
+    /*******
+     * If neither `ExtractBefore` nor `ExtractAfter` is provided, or if `OriginalString` is empty,
+     * the function returns null.
+     *******/
+    if ((!ExtractBefore && !ExtractAfter) || !OriginalString) return null;
+
+    /*******
+     * Initialize variables:
+     * - `UpdatedString` with `OriginalString`.
+     * - `StringBefore` and `StringAfter` to store the extracted substrings.
+     * - `StringBeforeIndex` and `StringAfterIndex` to track positions for extraction.
+     * - `BeforeCount` and `AfterCount` to track the occurrence counts for `ExtractBefore` and `ExtractAfter`.
+     *******/
+    let UpdatedString = OriginalString;
+    let StringBefore = "";
+    let StringAfter = "";
+    let StringBeforeIndex = -1;
+    let StringAfterIndex = -1;
+    let BeforeCount = CountExtractBefore > 0 ? 0 : 2;
+    let AfterCount = CountExtractAfter > 0 ? 0 : 2;
+
+    /*******
+     * Loop through each character in `OriginalString` to find the positions for extraction.
+     *******/
+    for (let i = 0; i < OriginalString.length; ++i) {
+        /*******
+         * Increment `BeforeCount` if the current character matches `ExtractBefore`.
+         *******/
+        if (OriginalString[i] === ExtractBefore && BeforeCount < CountExtractBefore) ++BeforeCount;
+
+        /*******
+         * Increment `AfterCount` if the current character matches `ExtractAfter`.
+         *******/
+        if (OriginalString[i] === ExtractAfter && AfterCount < CountExtractAfter) ++AfterCount;
+
+        /*******
+         * If `BeforeCount` matches `CountExtractBefore`, record the current index as `StringBeforeIndex`.
+         *******/
+        if (OriginalString[i] === ExtractBefore && BeforeCount === CountExtractBefore) {
+            StringBeforeIndex = i;
+            ++BeforeCount;
+        }
+
+        /*******
+         * If `AfterCount` matches `CountExtractAfter`, record the current index as `StringAfterIndex`.
+         *******/
+        if (OriginalString[i] === ExtractAfter && AfterCount === CountExtractAfter) {
+            StringAfterIndex = i;
+            ++AfterCount;
+        }
+
+        /*******
+         * If both `BeforeCount` and `AfterCount` exceed their respective target counts,
+         * exit the loop as further extraction positions are unnecessary.
+         *******/
+        if (BeforeCount > CountExtractBefore && AfterCount > CountExtractAfter) {
+            break;
+        }
+    }
+
+    /*******
+     * Extract `StringBefore` from `OriginalString` based on `StringBeforeIndex` and `CharactersToExtractBefore`.
+     * Extract `StringAfter` from `OriginalString` based on `StringAfterIndex` and `CharactersToExtractAfter`.
+     *******/
+    StringBefore = StringBeforeIndex >= 0 ? OriginalString.substring(StringBeforeIndex - CharactersToExtractBefore, StringBeforeIndex) : "";
+    StringAfter = StringAfterIndex >= 0 ? OriginalString.substring(StringAfterIndex + CharactersToExtractAfter + 1, StringAfterIndex + 1) : "";
+
+    /*******
+     * If `StringBeforeIndex` is less than or equal to `StringAfterIndex`, remove `StringBefore` and `StringAfter` from `UpdatedString`.
+     * Return the extracted strings and the updated string.
+     *******/
+    if (StringBeforeIndex < StringAfterIndex || StringBeforeIndex === StringAfterIndex) {
+        UpdatedString = UpdatedString.slice(0, StringBeforeIndex - CharactersToExtractBefore) + UpdatedString.slice(StringBeforeIndex);
+        StringAfterIndex -= CharactersToExtractBefore;
+        UpdatedString = UpdatedString.slice(0, StringAfterIndex + 1) + UpdatedString.slice(StringAfterIndex + CharactersToExtractAfter + 1);
+
+        return { StringBefore, StringAfter, UpdatedString };
+    }
+
+    /*******
+     * If `StringBeforeIndex` is greater than `StringAfterIndex`, remove `StringAfter` and `StringBefore` from `UpdatedString`.
+     * Return the extracted strings and the updated string.
+     *******/
+    if (StringBeforeIndex > StringAfterIndex) {
+        UpdatedString = UpdatedString.slice(0, StringAfterIndex + 1) + UpdatedString.slice(StringAfterIndex + CharactersToExtractAfter + 1);
+        StringBeforeIndex -= CharactersToExtractAfter;
+        UpdatedString = UpdatedString.slice(0, StringBeforeIndex - CharactersToExtractBefore) + UpdatedString.slice(StringBeforeIndex);
+
+        return { StringBefore, StringAfter, UpdatedString };
+    }
+
+    /*******
+     * Return the extracted strings and the updated string.
+     *******/
+    return { StringBefore, StringAfter, UpdatedString };
+}
