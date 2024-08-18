@@ -115,9 +115,6 @@ USER_SCHEMA.methods.GenerateAccessToken = async function () {
     return await JSON_WEB_TOKEN.sign(
         {
             _id: this._id,
-            email: this.email,
-            username: this.username,
-            fullName: this.fullName,
         },
         PROCESS.env.ACCESS_TOKEN_SECRET, // Secret key for signing the token
         {
